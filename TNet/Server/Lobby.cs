@@ -18,8 +18,8 @@ internal static class Lobby
     public static readonly BlowFish blowFish = new(key);
     static TcpListener? listener;
 
-    public static List<Client> clients = [];
-    public static List<Room> rooms = [];
+    public readonly static List<Client> clients = [];
+    public readonly static List<Room> rooms = [];
 
     public static LobbyState state { get; private set; } = LobbyState.NotRunning;
 
@@ -34,6 +34,7 @@ internal static class Lobby
         state = LobbyState.Initing;
 
         clients.Clear();
+        rooms.Clear();
 
         try
         {
