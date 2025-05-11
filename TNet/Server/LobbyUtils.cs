@@ -27,7 +27,7 @@ internal class LobbyUtils
         Log("New connection from: " + ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString());
     }
 #pragma warning restore
-    public static void Decrypt(ref Packet packet, BlowFish fish)
+    public static void Decrypt(Packet packet, BlowFish fish)
     {
         ulong val = 0;
 

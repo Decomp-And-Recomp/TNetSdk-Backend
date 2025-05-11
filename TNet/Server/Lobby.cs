@@ -123,7 +123,7 @@ internal static class Lobby
         
         Packet p = new(bytes, bytes.Length, true);
 
-        LobbyUtils.Decrypt(ref p, blowFish);
+        LobbyUtils.Decrypt(p, blowFish);
 
         if (!unPacker.ParserPacket(p)) Console.WriteLine("S");
 
