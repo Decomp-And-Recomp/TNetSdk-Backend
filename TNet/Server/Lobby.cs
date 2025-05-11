@@ -125,7 +125,7 @@ internal static class Lobby
 
         LobbyUtils.Decrypt(p, blowFish);
 
-        if (!unPacker.ParserPacket(p)) Console.WriteLine("S");
+        if (!unPacker.ParserPacket(p)) return;
 
         if (unPacker.GetProtocol() > 2 || unPacker.GetProtocol() < 1)
         {
