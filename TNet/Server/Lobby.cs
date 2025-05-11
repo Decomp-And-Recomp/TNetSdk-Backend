@@ -150,7 +150,7 @@ internal static class Lobby
         switch (command) // room commands
         {
             case CMD.room_drag_list: await LobbyCmdImpl.OnRoomDragList(unPacker, client); return;
-            //case CMD.room_create: await LobbyCmdImpl.OnRoomCreate(unPacker, client); return;
+            case CMD.room_create: await LobbyCmdImpl.OnRoomCreate(unPacker, client); return;
             case CMD.room_set_var: await LobbyCmdImpl.OnRoomSetVar(unPacker, client); return;
         }
 

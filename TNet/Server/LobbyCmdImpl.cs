@@ -1,4 +1,5 @@
-﻿using TNet.Server.Binary;
+﻿using System.Runtime.InteropServices;
+using TNet.Server.Binary;
 using TNet.Server.Binary.Protocol;
 using TNet.Server.Cmd;
 using TNet.Server.Data;
@@ -44,22 +45,25 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        Debug.Log(roomDragList.groupId);
-        Debug.Log(roomDragList.page);
-        Debug.Log(roomDragList.pageSplit);
-        Debug.Log(roomDragList.listType);
-
         await Send(RoomDragListResCmd.Response(roomDragList.page, roomDragList.pageSplit, roomDragList.listType), client);
     }
 
     public static async Task OnRoomCreate(UnPacker unPacker, Client client)
     {
-        //RoomCreateCmd cmd = new(unPacker);
-        //LobbyUtils.Log(cmd.groupId);
-        //return;
-        //Packet packet = RoomCreateResCmd.Response(RoomCreateResCmd.Result.full, 5);
+        if (!RoomCreateCmd.TryParse(unPacker, out var cmd))
+        {
+            LobbyUtils.LogBadUnpacker("OnRoomCreate");
+            return;
+        }
 
-        //await Send(packet, client);
+        if (!Room.TryCreate(cmd, out var room))
+        {
+            LobbyUtils.Log("Couldnt create new room. (full?)", ConsoleColor.Red);
+            await Send(RoomCreateResCmd.Response(RoomCreateResCmd.Result.full, 0), client);
+            return;
+        }
+
+        await Send(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
     }
 
     public static async Task OnRoomSetVar(UnPacker unPacker, Client client)
