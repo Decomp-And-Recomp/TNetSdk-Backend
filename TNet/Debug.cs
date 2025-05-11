@@ -65,7 +65,7 @@
             string className = callerFrame.GetMethod().DeclaringType.FullName;
             int line = callerFrame.GetFileLineNumber();
 
-            Log($"{className}.{methodName}:{line}");
+            Log($"{className}.{methodName}:{line}", color);
         }
 
         public static void LogStackFull(ConsoleColor color = ConsoleColor.White)
@@ -80,7 +80,7 @@
                 string className = callerFrame.GetMethod().DeclaringType.FullName;
                 int line = callerFrame.GetFileLineNumber();
 
-                Log($"{className}.{methodName}:{line}");
+                Log($"{className}.{methodName}:{line}", color);
             }
         }
 #pragma warning restore
