@@ -18,19 +18,10 @@ internal static class Lobby
     public static readonly BlowFish blowFish = new(key);
     static TcpListener? listener;
 
-    public readonly static Dictionary<ushort, Client> clients;
-    public readonly static List<Room> rooms;
+    public readonly static Dictionary<ushort, Client> clients = [];
+    public readonly static List<Room> rooms = [];
 
     public static LobbyState state { get; private set; } = LobbyState.NotRunning;
-
-    static Lobby()
-    {
-        clients = [];
-        rooms = [];
-
-        //clients.Capacity = ushort.MaxValue;
-        //rooms.Capacity = ushort.MaxValue;
-    }
 
     public static async Task Run(IPAddress address, int port)
     {
@@ -135,7 +126,6 @@ internal static class Lobby
 
         CMD command = (CMD)unPacker.GetCmd();
 
-        //LobbyUtils.Log(unPacker.GetCmd() + " Protocol" + unPacker.GetProtocol(), ConsoleColor.Cyan);
         LobbyUtils.Log($"Protocol-{unPacker.GetProtocol()} Cmd-{unPacker.GetCmd()}", ConsoleColor.Cyan);
 
         if (unPacker.GetProtocol() == 1)
