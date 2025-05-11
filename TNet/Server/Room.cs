@@ -1,5 +1,5 @@
-﻿using TNet.Server.Cmd;
-using TNet.Server.Data;
+﻿using TNet.Server.Data;
+using TNet.Server.Requests;
 
 namespace TNet.Server;
 
@@ -20,7 +20,7 @@ internal class Room
 
     Room() { }
 
-    public static bool TryCreate(RoomCreateCmd cmd, out Room room)
+    public static bool TryCreate(RoomCreateCmd cmd, out Room room, Client owner)
     {
         room = new();
 
@@ -45,6 +45,11 @@ internal class Room
         room.roomType = cmd.roomType;
 
         LobbyUtils.Log($"Created new room with id: {room.id}", ConsoleColor.Cyan);
+
+        room.owner = owner;
+        room.clients.Add(owner);
+
+        owner.room = room;
 
         return true;
     }

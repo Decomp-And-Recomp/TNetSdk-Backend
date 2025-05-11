@@ -1,8 +1,8 @@
-﻿using System.Runtime.InteropServices;
-using TNet.Server.Binary;
+﻿using TNet.Server.Binary;
 using TNet.Server.Binary.Protocol;
 using TNet.Server.Cmd;
 using TNet.Server.Data;
+using TNet.Server.Notifications;
 using TNet.Server.Requests;
 using TNet.Server.Responses;
 
@@ -56,7 +56,7 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        if (!Room.TryCreate(cmd, out var room))
+        if (!Room.TryCreate(cmd, out var room, client))
         {
             LobbyUtils.Log("Couldnt create new room. (full?)", ConsoleColor.Red);
             await Send(RoomCreateResCmd.Response(RoomCreateResCmd.Result.full, 0), client);
@@ -64,14 +64,26 @@ internal static class LobbyCmdImpl
         }
 
         await Send(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
+
+        await Send(RoomJoinNotifyCmd.Notify(client), client);
     }
 
     public static async Task OnRoomSetVar(UnPacker unPacker, Client client)
     {
-        RoomSetVarCmd cmd = new(unPacker);
+        if (!RoomSetVarCmd.TryParse(unPacker, out var cmd))
+        {
+            LobbyUtils.LogBadUnpacker("OnRoomSetVar");
+            return;
+        }
 
-        //LobbyUtils.Log(Convert.ToBase64String(cmd.var), ConsoleColor.DarkCyan);
-        //await Send(RoomVarNotifyCmd.Response(client.id, cmd.key, cmd.var), client);
+        if (cmd.var == null || client.room == null)
+        {
+            Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
+            return;
+        }
+
+        foreach (Client c in client.room.clients)
+            _ = Send(RoomVarNotifyCmd.Response(client.id, cmd.key, cmd.var), c);
     }
 
     static async Task Send(Packet packet, Client client)

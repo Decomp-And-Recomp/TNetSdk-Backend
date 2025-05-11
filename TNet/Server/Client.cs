@@ -5,6 +5,7 @@ namespace TNet.Server;
 internal class Client(TcpClient client) : IDisposable
 {
     public readonly TcpClient connection = client;
+    public Room? room;
 
     public bool isLogged;
 

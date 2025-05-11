@@ -127,7 +127,7 @@ internal static class Lobby
 
         if (unPacker.GetProtocol() > 2 || unPacker.GetProtocol() < 1)
         {
-            DisconnectClient(client, DisconnectCode.BadProtocol);
+            DisconnectClient(client, DisconnectCode.UnknownProtocol);
             return;
         }
 
@@ -157,12 +157,12 @@ internal static class Lobby
         LobbyUtils.LogUnimpl(unPacker.GetProtocol() + ":" + unPacker.GetCmd());
     }
 
-    static void DisconnectClient(Client client)
+    public static void DisconnectClient(Client client)
     {
         DisconnectClient(client, DisconnectCode.NoCode);
     }
 
-    static void DisconnectClient(Client client, DisconnectCode code)
+    public static void DisconnectClient(Client client, DisconnectCode code)
     {
         LobbyUtils.Log("Disconnected player: " + code);
         client.Disconnect();

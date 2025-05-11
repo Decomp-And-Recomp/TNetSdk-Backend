@@ -6,10 +6,9 @@ internal static class BinaryExtensions
 {
     public static void PushString(this BufferWriter writer, string value, System.Text.Encoding encoding)
     {
-        ushort length = 0;
         byte[] bytes = encoding.GetBytes(value);
 
-        writer.PushUInt16(length);
+        writer.PushUInt16((ushort)bytes.Length);
         writer.PushByteArray(bytes, bytes.Length);
     }
 

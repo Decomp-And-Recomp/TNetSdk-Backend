@@ -4,7 +4,8 @@ internal enum DisconnectCode
 {
     NoCode = 0,
     TooMuchData = 1,
-    BadProtocol = 2,
+    UnknownProtocol = 2,
     UnknownCommand = 3,
-    CouldntAddToDictionary = 4
+    CouldntAddToDictionary = 4,
+    SuspiciousRequests = 5,
 }

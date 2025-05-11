@@ -3,23 +3,23 @@ using TNet.Server.Binary;
 using TNet.Server.Binary.Protocol;
 using TNet.Server.Data;
 
-namespace TNet.Server.Cmd;
+namespace TNet.Server.Requests;
 
 internal class RoomCreateCmd
 {
-	public string roomName = string.Empty;
-	public string password = string.Empty;
-	public string param = string.Empty;
+    public string roomName = string.Empty;
+    public string password = string.Empty;
+    public string param = string.Empty;
 
-	public ushort groupId;
-	public ushort maxUsers;
+    public ushort groupId;
+    public ushort maxUsers;
 
     public RoomType roomType;
-	public RoomSwitchMasterType roomSwitchMasterType;
+    public RoomSwitchMasterType roomSwitchMasterType;
 
-	RoomCreateCmd() { }
+    RoomCreateCmd() { }
 
-	public static bool TryParse(UnPacker unPacker, out RoomCreateCmd cmd)
+    public static bool TryParse(UnPacker unPacker, out RoomCreateCmd cmd)
     {
         ushort tempUshort = 0;
 
@@ -41,5 +41,5 @@ internal class RoomCreateCmd
         if (!unPacker.PopString(ref cmd.password, Encoding.ASCII)) return false;
 
         return true;
-	}
+    }
 }
