@@ -2,10 +2,11 @@ using System.Text;
 using TNet.Server.Binary;
 using TNet.Server.Binary.Protocol;
 using TNet.Server.ClientJunk;
+using TNet.Server.Responses;
 
 namespace TNet.Server.Cmd;
 
-internal class RoomJoinResCmd : UnPacker
+internal class RoomJoinResCmd
 {
 	public enum Result
 	{
@@ -20,9 +21,9 @@ internal class RoomJoinResCmd : UnPacker
 
 	public ushort m_sit_position;
 
-	public RoomDragListResCmd.RoomInfo m_room_info;
+	//public RoomDragListResCmd.RoomInfo m_room_info;
 
-	public override bool ParserPacket(Packet packet)
+	/*public override bool ParserPacket(Packet packet)
 	{
 		if (!base.ParserPacket(packet))
 		{
@@ -87,7 +88,7 @@ internal class RoomJoinResCmd : UnPacker
 	{
 		ParserPacket(packet);
 		event_data.data.Add("result", m_result);
-		/*if (m_result == Result.ok)
+		if (m_result == Result.ok)
 		{
 			target.CurRoom = TNetRoom.FromRoomInfo(m_room_info);
 			target.CurRoom.AddUser(target.Myself);
@@ -98,6 +99,6 @@ internal class RoomJoinResCmd : UnPacker
 				target.CurRoom.RoomMaster = target.Myself;
 			}
 			event_data.data.Add("room", target.CurRoom);
-		}*/
-	}
+		}
+	}*/
 }

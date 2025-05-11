@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using TNet.Encryption;
-using TNet.Helpers;
 using TNet.Server.Binary;
 
 namespace TNet.Server;
@@ -10,19 +9,24 @@ internal class LobbyUtils
 {
     public static void Log(object message, ConsoleColor color = ConsoleColor.White)
     {
-        DebugHelper.Log("[Lobby] " + message, color);
+        Debug.Log("[Lobby] " + message, color);
+    }
+
+    public static void LogBadUnpacker(object message)
+    {
+        Debug.Log("[Lobby:Bad Unpacker] " + message, ConsoleColor.DarkRed);
     }
 
     public static void LogUnimpl(object message)
     {
-        DebugHelper.Log("[Lobby:Unimplemented] " + message, ConsoleColor.DarkRed);
+        Debug.Log("[Lobby:Unimplemented] " + message, ConsoleColor.DarkRed);
     }
-
+#pragma warning disable
     public static void LogNewConnection(TcpClient client)
     {
         Log("New connection from: " + ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString());
     }
-
+#pragma warning restore
     public static void Decrypt(ref Packet packet, BlowFish fish)
     {
         ulong val = 0;
@@ -33,18 +37,18 @@ internal class LobbyUtils
         packet.Position = 0;
         packet.PushUInt64(val);
     }
-
+#pragma warning disable
     public static void Encrypt(ref Packet packet, BlowFish fish)
     {
-        return;
-        ulong val = 0;
+        /*ulong val = 0;
 
         packet.Position = 0;
         packet.PopUInt64(ref val);
         fish.Encrypt(ref val);
         packet.Position = 0;
-        packet.PushUInt64(val);
+        packet.PushUInt64(val);*/
     }
+#pragma warning restore
 
     /*
      		    uint num = (uint)((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);

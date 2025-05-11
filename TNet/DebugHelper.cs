@@ -1,8 +1,8 @@
-﻿namespace TNet.Helpers
+﻿namespace TNet
 {
-    public static class DebugHelper
+    public static class Debug
     {
-        static readonly object logLock = new object();
+        static readonly object logLock = new();
 
         ///<summary>Logs message without any additional text.</summary>
         public static void Log(object message, ConsoleColor color = ConsoleColor.White)

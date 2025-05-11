@@ -8,10 +8,9 @@ namespace TNet.Server;
 
 internal class Room
 {
-    public List<Client> clients = new();
+    public string name, comment;
 
-    public Room()
-    {
-        
-    }
+    public Client owner;
+
+    public List<Client> clients = [];
 }

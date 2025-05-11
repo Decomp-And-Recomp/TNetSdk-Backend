@@ -1,5 +1,6 @@
 namespace TNet.Server;
 
+#pragma warning disable CA1069
 internal enum CMD
 {
 	sys_none = 0,
@@ -45,3 +46,4 @@ internal enum CMD
 	room_set_create_param = 33,
 	room_create_param_change = 34
 }
+#pragma warning restore

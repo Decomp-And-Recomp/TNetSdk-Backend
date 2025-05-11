@@ -1,7 +1,7 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using TNet.Encryption;
-using TNet.Helpers;
 using TNet.Server.Binary;
 using TNet.Server.Binary.Protocol;
 using TNet.Server.Cmd;
@@ -18,17 +18,26 @@ internal static class Lobby
     public static readonly BlowFish blowFish = new(key);
     static TcpListener? listener;
 
-    public readonly static List<Client> clients = [];
-    public readonly static List<Room> rooms = [];
+    public readonly static Dictionary<ushort, Client> clients;
+    public readonly static List<Room> rooms;
 
     public static LobbyState state { get; private set; } = LobbyState.NotRunning;
+
+    static Lobby()
+    {
+        clients = [];
+        rooms = [];
+
+        //clients.Capacity = ushort.MaxValue;
+        //rooms.Capacity = ushort.MaxValue;
+    }
 
     public static async Task Run(IPAddress address, int port)
     {
         switch (state)
         {
-            case LobbyState.Initing: DebugHelper.LogError("Tried running server while Initing one."); return;
-            case LobbyState.Running: DebugHelper.LogError("Tried running server while one is already Running."); return;
+            case LobbyState.Initing: Debug.LogError("Tried running server while Initing one."); return;
+            case LobbyState.Running: Debug.LogError("Tried running server while one is already Running."); return;
         }
 
         state = LobbyState.Initing;
@@ -43,7 +52,7 @@ internal static class Lobby
         }
         catch (Exception ex)
         {
-            DebugHelper.LogException("Exception on running the server.", ex);
+            Debug.LogException("Exception on running the server.", ex);
             state = LobbyState.NotRunning;
             return;
         }
@@ -66,7 +75,20 @@ internal static class Lobby
     static async Task HandleConnection(TcpClient tcpClient)
     {
         Client client = new(tcpClient);
-        clients.Add(client);
+
+        for (ushort i = 1; i < ushort.MaxValue; i++)
+        {
+            if (clients.TryAdd(i, client)) continue;
+
+            client.id = i;
+        }
+
+        if (client.id == 0)
+        {
+            LobbyUtils.Log("Unable to add new client, disconnecting.", ConsoleColor.Red);
+            DisconnectClient(client, DisconnectCode.TooManyPlayers);
+            return;
+        }
 
         LobbyUtils.LogNewConnection(tcpClient);
 
@@ -114,27 +136,28 @@ internal static class Lobby
         CMD command = (CMD)unPacker.GetCmd();
 
         //LobbyUtils.Log(unPacker.GetCmd() + " Protocol" + unPacker.GetProtocol(), ConsoleColor.Cyan);
-        LobbyUtils.Log($"Cmd-{unPacker.GetCmd()} Protocol-{unPacker.GetProtocol()}", ConsoleColor.Cyan);
+        LobbyUtils.Log($"Protocol-{unPacker.GetProtocol()} Cmd-{unPacker.GetCmd()}", ConsoleColor.Cyan);
 
         if (unPacker.GetProtocol() == 1)
         {
             switch (command) // sys commands
             {
-                //case CMD.sys_heartbeat: await LobbyCmdImpl.OnSystemHeartbeat(unPacker, client); return; // CMD.sys_heartbeat
+                case CMD.sys_heartbeat: await LobbyCmdImpl.OnSystemHeartbeat(unPacker, client); return; // CMD.sys_heartbeat
                 case CMD.sys_login: await LobbyCmdImpl.OnSystemPlayerLogin(unPacker, client); return;
             }
 
-            LobbyUtils.LogUnimpl(unPacker.GetCmd() + ":" + unPacker.GetProtocol());
+            LobbyUtils.LogUnimpl(unPacker.GetProtocol() + ":" + unPacker.GetCmd());
             return;
         }
 
         switch (command) // room commands
         {
+            case CMD.room_drag_list: await LobbyCmdImpl.OnRoomDragList(unPacker, client); return;
             //case CMD.room_create: await LobbyCmdImpl.OnRoomCreate(unPacker, client); return;
             case CMD.room_set_var: await LobbyCmdImpl.OnRoomSetVar(unPacker, client); return;
         }
 
-        LobbyUtils.LogUnimpl(unPacker.GetCmd() + ":" + unPacker.GetProtocol());
+        LobbyUtils.LogUnimpl(unPacker.GetProtocol() + ":" + unPacker.GetCmd());
     }
 
     static void DisconnectClient(Client client)
