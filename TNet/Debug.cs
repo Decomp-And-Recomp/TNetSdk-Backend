@@ -84,5 +84,11 @@
             }
         }
 #pragma warning restore
+
+        public static void Pause()
+        {
+            Log("Press any key to continue..", ConsoleColor.DarkCyan);
+            Console.ReadKey(false);
+        }
     }
 }

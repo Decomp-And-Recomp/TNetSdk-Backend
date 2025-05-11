@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using TNet.Encryption;
@@ -12,14 +14,14 @@ public enum LobbyState { NotRunning, Initing, Running}
 
 internal static class Lobby
 {
-    const int maxDataLength = 1024;
+    const int maxDataLength = 4096;
 
     const string key = "Triniti_Tlck";
     public static readonly BlowFish blowFish = new(key);
     static TcpListener? listener;
 
-    public readonly static Dictionary<ushort, Client> clients = [];
-    public readonly static List<Room> rooms = [];
+    public readonly static ConcurrentDictionary<ushort, Client> clients = [];
+    public readonly static ConcurrentDictionary<ushort, Room> rooms = [];
 
     public static LobbyState state { get; private set; } = LobbyState.NotRunning;
 
@@ -67,21 +69,26 @@ internal static class Lobby
     {
         Client client = new(tcpClient);
 
+        bool added = false;
+
         for (ushort i = 1; i < ushort.MaxValue; i++)
         {
-            if (clients.TryAdd(i, client)) continue;
+            if (!clients.TryAdd(i, client)) continue;
+
+            added = true;
 
             client.id = i;
+            break;
         }
 
-        if (client.id == 0)
+        if (!added)
         {
             LobbyUtils.Log("Unable to add new client, disconnecting.", ConsoleColor.Red);
-            DisconnectClient(client, DisconnectCode.TooManyPlayers);
+            DisconnectClient(client, DisconnectCode.CouldntAddToDictionary);
             return;
         }
 
-        LobbyUtils.LogNewConnection(tcpClient);
+        LobbyUtils.LogNewConnection(client);
 
         NetworkStream stream = tcpClient.GetStream();
 

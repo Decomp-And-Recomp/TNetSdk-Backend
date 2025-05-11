@@ -1,13 +1,51 @@
-using System.Text;
 using TNet.Server.Binary;
 using TNet.Server.Binary.Protocol;
-using TNet.Server.Requests;
 using TNet.Server.Data;
 
 namespace TNet.Server.Responses;
 
-internal class RoomDragListResCmd
+internal static class RoomDragListResCmd
 {
+    /// <summary>Creates a response, takes rooms from <see cref="Lobby.rooms"/>.</summary>
+    public static Packet Response(ushort page, ushort pageSum, RoomDragListType listType)
+    {
+        Packer packer = new();
+
+        packer.PushUInt16(page);
+        packer.PushUInt16(pageSum); // page length?
+        packer.PushUInt16((ushort)listType);
+
+        /*var list = Lobby.rooms.OrderBy(kv => kv.Key) // dont ask me, i took it from chatGPT
+            .Skip((page - 1) * pageSum)
+            .Take(pageSum)
+            .Select(kv => kv.Value)
+            .ToList();*/
+        var list = new List<Room>();
+
+        //for (int)
+
+        //packer.PushUInt16((ushort)list.Count); // sent rooms length
+        packer.PushUInt16(0); // sent rooms length
+
+        /*for (int i = 0; i < list.Count; i++)
+        {
+            var info = SerializedRoomInfo.FromRoom(list[i]);
+
+            packer.PushUInt16(info.roomId);
+            packer.PushUInt16(info.groupId);
+            packer.PushUInt16(info.masterId);
+            packer.PushUInt16(info.onlineUsers);
+            packer.PushUInt16(info.maxUsers);
+            packer.PushUInt16(info.state);
+            packer.PushUInt16(info.passworded);
+
+            packer.PushByteArray(info.creatorName, 16);
+            packer.PushByteArray(info.roomName, 16);
+            packer.PushByteArray(info.roomComment, 64);
+        }*/
+
+        return packer.MakePacket(Protocol.room, CMD.room_drag_list_res);
+    }
     /*
 
     public ushort m_cur_page;
@@ -20,6 +58,7 @@ internal class RoomDragListResCmd
 
     /*public override bool ParserPacket(Packet packet)
     {
+    
         if (!base.ParserPacket(packet))
         {
             return false;

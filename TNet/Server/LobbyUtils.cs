@@ -22,9 +22,10 @@ internal class LobbyUtils
         Debug.Log("[Lobby:Unimplemented] " + message, ConsoleColor.DarkRed);
     }
 #pragma warning disable
-    public static void LogNewConnection(TcpClient client)
+    public static void LogNewConnection(Client client)
     {
-        Log("New connection from: " + ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString());
+        Log("New connection from: " + ((IPEndPoint)client.connection.Client.RemoteEndPoint).Address.ToString()
+            + " id:" + client.id);
     }
 #pragma warning restore
     public static void Decrypt(Packet packet, BlowFish fish)
@@ -38,7 +39,7 @@ internal class LobbyUtils
         packet.PushUInt64(val);
     }
 #pragma warning disable
-    public static void Encrypt(ref Packet packet, BlowFish fish)
+    public static void Encrypt(Packet packet, BlowFish fish)
     {
         /*ulong val = 0;
 

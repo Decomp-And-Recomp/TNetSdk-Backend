@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net.Sockets;
 
 namespace TNet.Server;
 
@@ -18,7 +13,16 @@ internal class Client(TcpClient client) : IDisposable
 
     public void Disconnect()
     {
-        Lobby.clients.Remove(id);
+        LobbyUtils.Log("Removing: " + id, ConsoleColor.DarkRed);
+        if (Lobby.clients.TryRemove(id, out var removed))
+        {
+            if (removed != null && removed != this)
+                LobbyUtils.Log("We deadass just disconnected random player 💀", ConsoleColor.DarkMagenta);
+        }
+        else
+        {
+            LobbyUtils.Log("S", ConsoleColor.DarkRed);
+        }
 
         Dispose();
     }

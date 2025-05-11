@@ -6,5 +6,5 @@ internal enum DisconnectCode
     TooMuchData = 1,
     BadProtocol = 2,
     UnknownCommand = 3,
-    TooManyPlayers = 4
+    CouldntAddToDictionary = 4
 }

@@ -14,10 +14,8 @@ internal static class LobbyCmdImpl
     {
         ushort ping = 0;
         unPacker.PopUInt16(ref ping);
-        LobbyUtils.Log("Ping " + ping);
-        Packet packet = SysHeartbeatResCmd.Response(0);
 
-        await Send(packet, client);
+        await Send(SysHeartbeatResCmd.Response(0), client);
     }
 
     public static async Task OnSystemPlayerLogin(UnPacker unPacker, Client client)
@@ -50,6 +48,8 @@ internal static class LobbyCmdImpl
         Debug.Log(roomDragList.page);
         Debug.Log(roomDragList.pageSplit);
         Debug.Log(roomDragList.listType);
+
+        await Send(RoomDragListResCmd.Response(roomDragList.page, roomDragList.pageSplit, roomDragList.listType), client);
     }
 
     public static async Task OnRoomCreate(UnPacker unPacker, Client client)
@@ -72,8 +72,18 @@ internal static class LobbyCmdImpl
 
     static async Task Send(Packet packet, Client client)
     {
-        LobbyUtils.Encrypt(ref packet, Lobby.blowFish);
+        LobbyUtils.Encrypt(packet, Lobby.blowFish);
 
-        await client.connection.GetStream().WriteAsync(packet.ByteArray());
+        byte[] bytes = new byte[packet.Length];
+
+        packet.Position = 0;
+
+        if (!packet.PopByteArray(ref bytes, packet.Length-1))
+        {
+            Debug.LogError("Packet Fail");
+            return;
+        }
+
+        await client.connection.GetStream().WriteAsync(bytes);
     }
 }
