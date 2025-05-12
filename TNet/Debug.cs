@@ -25,6 +25,8 @@
             }
         }
 
+        public static void LogInfo(object msg) => Log(msg, ConsoleColor.Cyan);
+
         ///<summary>Logs message and stack trace</summary>
         public static void LogWarning(object msg)
         {
