@@ -1,4 +1,5 @@
 ﻿using TNet.Server.Binary;
+using TNet.Server.Cmd;
 using TNet.Server.Data;
 using TNet.Server.Notifications;
 using TNet.Server.Requests;
@@ -64,7 +65,7 @@ internal class Room : IDisposable, IAsyncDisposable
     public async Task ShutDown()
     {
         state = State.shuttingDown;
-        Debug.Log("Shutting down");
+        Debug.LogInfo("Shutting a room down");
 
         foreach (Client client in clients) await client.RemoveFromRoom();
 
@@ -98,15 +99,35 @@ internal class Room : IDisposable, IAsyncDisposable
 
         if (masterSwitchType == RoomSwitchMasterType.Auto && clients.Count > 0)
         {
-            owner = clients[0];
-            return;
+            if (TryChangeOwner(clients[0])) return;
         }
 
-        Debug.Log("No room owner.");
+        Debug.LogInfo("No room owner.");
 
         await ShutDown();
     }
-#pragma warning disable CA2012
+
+    public bool TryChangeOwner(Client newOwner)
+    {
+        if (clients.Contains(newOwner))
+        {
+            Debug.LogWarning("Tried to set a new owner that is not in the room.");
+            return false;
+        }
+
+        owner = newOwner;
+
+        Packet notification = RoomCreaterChangeNotifyCmd.Notify(owner.id);
+
+        foreach (Client c in clients) _ = LobbyCmdImpl.SendToClient(notification, c);
+
+        Debug.LogInfo("Changed lobby owner");
+
+        return true;
+    }
+
+
+#pragma warning disable CA2012 // Not sure if its good idea tho.
     public void Dispose() => DisposeAsync().GetAwaiter().GetResult();
 #pragma warning restore
 
