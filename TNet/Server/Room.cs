@@ -106,6 +106,27 @@ internal class Room : IDisposable, IAsyncDisposable
         await ShutDown();
     }
 
+    public async Task Start(Client startedBy)
+    {
+        if (state != State.open)
+        {
+            Debug.LogWarning("Room has to be open, but the sate is: " + state);
+            return;
+        }
+
+        if (!clients.Contains(startedBy))
+        {
+            Lobby.DisconnectClient(startedBy, DisconnectCode.SuspiciousRequests);
+            return;
+        }
+
+        state = State.started;
+
+        Packet notification = RoomStartNotifyCmd.Notify(startedBy.id);
+
+        foreach (Client c in clients) await LobbyCmdImpl.SendToClient(notification, c);
+    }
+
     public bool TryChangeOwner(Client newOwner)
     {
         if (clients.Contains(newOwner))

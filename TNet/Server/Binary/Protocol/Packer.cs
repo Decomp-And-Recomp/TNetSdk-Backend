@@ -15,11 +15,19 @@ internal class Packer : BufferWriter
         SetData(m_data);
     }
 
+    [Obsolete("Use shortcut")]
+    public Packet MakePacket(Server.Protocol protocol, SysCMD cmd, bool allow_compress = true)
+        => MakePacket((ushort)protocol, (ushort)cmd, allow_compress);
+
+    [Obsolete("Use shortcut")]
     public Packet MakePacket(Server.Protocol protocol, RoomCMD cmd, bool allow_compress = true)
         => MakePacket((ushort)protocol, (ushort)cmd, allow_compress);
 
-    public Packet MakePacket(Server.Protocol protocol, SysCMD cmd, bool allow_compress = true)
-        => MakePacket((ushort)protocol, (ushort)cmd, allow_compress);
+    public Packet MakePacket(SysCMD cmd, bool allow_compress = true)
+        => MakePacket(1, (ushort)cmd, allow_compress);
+
+    public Packet MakePacket(RoomCMD cmd, bool allow_compress = true)
+        => MakePacket(2, (ushort)cmd, allow_compress);
 
     public Packet MakePacket(ushort protocol, ushort cmd, bool allow_compress = true)
     {
