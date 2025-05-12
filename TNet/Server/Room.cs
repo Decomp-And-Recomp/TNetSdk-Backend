@@ -7,7 +7,7 @@ namespace TNet.Server;
 
 internal class Room : IDisposable, IAsyncDisposable
 {
-    public enum State { open, gaming, shuttingDown, close }
+    public enum State { open, started, shuttingDown, close }
 
     public State state { get; private set; }
 
