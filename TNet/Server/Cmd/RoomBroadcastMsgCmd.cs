@@ -12,6 +12,6 @@ internal class RoomBroadcastMsgCmd : RoomCmd
 
 	public Packet MakePacket()
 	{
-		return MakePacket(RoomCMD.room_broadcast_msg);
+		return MakePacket(RoomCMD.broadcast_msg);
 	}
 }

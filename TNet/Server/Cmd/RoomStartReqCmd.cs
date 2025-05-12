@@ -6,6 +6,6 @@ internal class RoomStartReqCmd : RoomCmd
 {
 	public Packet MakePacket()
 	{
-		return MakePacket(RoomCMD.room_start);
+		return MakePacket(RoomCMD.start);
 	}
 }

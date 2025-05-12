@@ -49,7 +49,7 @@ internal class Room : IDisposable, IAsyncDisposable
         room.masterSwitchType = cmd.roomSwitchMasterType;
         room.roomType = cmd.roomType;
 
-        LobbyUtils.Log($"Created new room with id: {room.id}", ConsoleColor.Cyan);
+        LobbyUtils.Log($"Created new room with: {room.id}, {room.masterSwitchType}, {room.roomType}", ConsoleColor.Cyan);
 
         room.owner = owner;
         room.clients.Add(owner);

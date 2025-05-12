@@ -12,6 +12,6 @@ internal class RoomSetUserStatusCmd : RoomCmd
 
 	public Packet MakePacket()
 	{
-		return MakePacket(RoomCMD.room_set_user_status);
+		return MakePacket(RoomCMD.set_user_status);
 	}
 }

@@ -19,6 +19,6 @@ internal static class RoomVarNotifyCmd
         packer.PushUInt16((ushort)data.Length);
         packer.PushByteArray(data, data.Length);
 
-        return packer.MakePacket(Protocol.room, RoomCMD.room_var_notify);
+        return packer.MakePacket(Protocol.room, RoomCMD.var_notify);
     }
 }

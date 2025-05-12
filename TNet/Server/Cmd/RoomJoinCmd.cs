@@ -21,7 +21,7 @@ namespace TNet.Server.Cmd
 
 		public Packet MakePacket()
 		{
-			return MakePacket(RoomCMD.room_join);
+			return MakePacket(RoomCMD.join);
 		}
 	}
 }

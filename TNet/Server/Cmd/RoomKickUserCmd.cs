@@ -11,6 +11,6 @@ internal class RoomKickUserCmd : RoomCmd
 
 	public Packet MakePacket()
 	{
-		return MakePacket(RoomCMD.room_kick_user);
+		return MakePacket(RoomCMD.kick_user);
 	}
 }

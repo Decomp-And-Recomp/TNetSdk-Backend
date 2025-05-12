@@ -44,7 +44,7 @@ internal static class RoomDragListResCmd
             packer.PushByteArray(info.roomComment, 64);
         }*/
 
-        return packer.MakePacket(Protocol.room, RoomCMD.room_drag_list_res);
+        return packer.MakePacket(Protocol.room, RoomCMD.drag_list_res);
     }
     /*
 

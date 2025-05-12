@@ -131,7 +131,6 @@ internal static class Lobby
             return;
         }
 
-        RoomCMD command = (RoomCMD)unPacker.GetCmd();
 
         LobbyUtils.Log($"Protocol-{unPacker.GetProtocol()} Cmd-{unPacker.GetCmd()}", ConsoleColor.Cyan);
 
@@ -145,19 +144,21 @@ internal static class Lobby
                 case SysCMD.login: await LobbyCmdImpl.OnSystemPlayerLogin(unPacker, client); return;
             }
 
-            LobbyUtils.LogUnimpl(unPacker.GetProtocol() + ":" + unPacker.GetCmd());
+            LobbyUtils.LogUnimpl(sysCommand);
             return;
         }
 
+        RoomCMD command = (RoomCMD)unPacker.GetCmd();
+
         switch (command) // room commands
         {
-            case RoomCMD.room_drag_list: await LobbyCmdImpl.OnRoomDragList(unPacker, client); return;
-            case RoomCMD.room_create: await LobbyCmdImpl.OnRoomCreate(unPacker, client); return;
-            case RoomCMD.room_leave: LobbyCmdImpl.OnRoomLeave(client); return;
-            case RoomCMD.room_set_var: await LobbyCmdImpl.OnRoomSetVar(unPacker, client); return;
+            case RoomCMD.drag_list: await LobbyCmdImpl.OnRoomDragList(unPacker, client); return;
+            case RoomCMD.create: await LobbyCmdImpl.OnRoomCreate(unPacker, client); return;
+            case RoomCMD.leave: LobbyCmdImpl.OnRoomLeave(client); return;
+            case RoomCMD.set_var: await LobbyCmdImpl.OnRoomSetVar(unPacker, client); return;
         }
 
-        LobbyUtils.LogUnimpl(unPacker.GetProtocol() + ":" + unPacker.GetCmd());
+        LobbyUtils.LogUnimpl(command);
     }
 
     public static void DisconnectClient(Client client)

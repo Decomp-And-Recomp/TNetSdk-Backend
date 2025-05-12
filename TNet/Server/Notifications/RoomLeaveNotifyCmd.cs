@@ -14,6 +14,6 @@ internal static class RoomLeaveNotifyCmd
 
         packer.PushUInt16(userId);
 
-        return packer.MakePacket(Protocol.room, RoomCMD.room_leave_notify);
+        return packer.MakePacket(Protocol.room, RoomCMD.leave_notify);
     }
 }
