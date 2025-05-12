@@ -8,6 +8,8 @@ internal class RoomSetVarCmd
     public ushort key;
     public byte[]? var;
 
+    RoomSetVarCmd() { }
+
     public static bool TryParse(UnPacker unPacker, out RoomSetVarCmd cmd)
     {
         cmd = new();
