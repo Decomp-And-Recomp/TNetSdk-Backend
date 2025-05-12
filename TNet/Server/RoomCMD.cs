@@ -1,15 +1,7 @@
 namespace TNet.Server;
 
-#pragma warning disable CA1069
-internal enum CMD
+internal enum RoomCMD
 {
-	sys_none = 0,
-	sys_heartbeat = 1,
-	sys_heartbeat_res = 2,
-	sys_login = 3,
-	sys_login_res = 4,
-	sys_logout = 5,
-
 	room_none = 0,
 	room_drag_list = 1,
 	room_drag_list_res = 2,
@@ -46,4 +38,3 @@ internal enum CMD
 	room_set_create_param = 33,
 	room_create_param_change = 34
 }
-#pragma warning restore

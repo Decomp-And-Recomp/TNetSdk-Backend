@@ -13,6 +13,6 @@ internal class RoomSendMsgCmd : RoomCmd
 
 	public Packet MakePacket()
 	{
-		return MakePacket(CMD.room_send_msg);
+		return MakePacket(RoomCMD.room_send_msg);
 	}
 }

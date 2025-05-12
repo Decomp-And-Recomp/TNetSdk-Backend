@@ -5,7 +5,7 @@ namespace TNet.Server.Cmd;
 
 internal class SysCmd : Packer
 {
-	public Packet MakePacket(CMD cmd)
+	public Packet MakePacket(RoomCMD cmd)
 	{
 		return MakePacket(1, (ushort)cmd);
 	}

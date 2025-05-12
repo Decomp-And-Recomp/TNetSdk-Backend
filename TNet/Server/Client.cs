@@ -15,6 +15,7 @@ internal class Client(TcpClient client) : IDisposable
     public void Disconnect()
     {
         LobbyUtils.Log("Removing: " + id, ConsoleColor.DarkRed);
+
         if (Lobby.clients.TryRemove(id, out var removed))
         {
             if (removed != null && removed != this)
@@ -25,11 +26,22 @@ internal class Client(TcpClient client) : IDisposable
             LobbyUtils.Log("S", ConsoleColor.DarkRed);
         }
 
+        _ = RemoveFromRoom();
+
         Dispose();
+    }
+
+    public async Task RemoveFromRoom()
+    {
+        if (room == null) return;
+
+        await room.RemoveClient(this);
     }
 
     public void Dispose()
     {
+        _ = RemoveFromRoom();
+
         connection?.Close();
         connection?.Dispose();
     }

@@ -6,6 +6,11 @@ namespace TNet.Server.Responses;
 
 internal static class SysLoginResCmd
 {
+    /// <summary> A person has to be logged into the system first, registering his nickname. </summary>
+    /// <param name="result">The result.</param>
+    /// <param name="userId">A unique user id (session id?)</param>
+    /// <param name="nickname">If the nickname contains.. uh.. just count it as "moderated" nickname.</param>
+    /// <returns>A packet response that has to be sent to the request's client.</returns>
     public static Packet Response(LoginResult result, ushort userId, string nickname)
     {
         Packer resultPacket = new();
@@ -13,6 +18,6 @@ internal static class SysLoginResCmd
         resultPacket.PushUInt16(userId);
         resultPacket.PushString(nickname, System.Text.Encoding.ASCII);
 
-        return resultPacket.MakePacket(Protocol.sys, CMD.sys_login_res);
+        return resultPacket.MakePacket(Protocol.sys, SysCMD.login_res);
     }
 }

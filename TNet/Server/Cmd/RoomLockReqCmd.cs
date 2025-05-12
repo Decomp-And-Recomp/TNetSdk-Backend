@@ -14,6 +14,6 @@ internal class RoomLockReqCmd : RoomCmd
 
 	public Packet MakePacket()
 	{
-		return MakePacket(CMD.room_lock_req);
+		return MakePacket(RoomCMD.room_lock_req);
 	}
 }

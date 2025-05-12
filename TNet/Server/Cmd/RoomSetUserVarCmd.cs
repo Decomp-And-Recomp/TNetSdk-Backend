@@ -13,6 +13,6 @@ internal class RoomSetUserVarCmd : RoomCmd
 
 	public Packet MakePacket()
 	{
-		return MakePacket(CMD.room_set_user_var);
+		return MakePacket(RoomCMD.room_set_user_var);
 	}
 }

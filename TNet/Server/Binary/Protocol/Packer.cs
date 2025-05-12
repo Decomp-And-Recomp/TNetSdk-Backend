@@ -15,7 +15,10 @@ internal class Packer : BufferWriter
         SetData(m_data);
     }
 
-    public Packet MakePacket(Server.Protocol protocol, CMD cmd, bool allow_compress = true)
+    public Packet MakePacket(Server.Protocol protocol, RoomCMD cmd, bool allow_compress = true)
+        => MakePacket((ushort)protocol, (ushort)cmd, allow_compress);
+
+    public Packet MakePacket(Server.Protocol protocol, SysCMD cmd, bool allow_compress = true)
         => MakePacket((ushort)protocol, (ushort)cmd, allow_compress);
 
     public Packet MakePacket(ushort protocol, ushort cmd, bool allow_compress = true)

@@ -16,7 +16,7 @@ internal static class LobbyCmdImpl
         ushort ping = 0;
         unPacker.PopUInt16(ref ping);
 
-        await Send(SysHeartbeatResCmd.Response(0), client);
+        await SendToClient(SysHeartbeatResCmd.Response(0), client);
     }
 
     public static async Task OnSystemPlayerLogin(UnPacker unPacker, Client client)
@@ -33,7 +33,7 @@ internal static class LobbyCmdImpl
 
         LobbyUtils.Log($"New user '{request.account}' idenefied as \"{request.nickname}\"");
 
-        await Send(SysLoginResCmd.Response(LoginResult.ok, client.id, request.nickname), client);
+        await SendToClient(SysLoginResCmd.Response(LoginResult.ok, client.id, request.nickname), client);
     }
     #endregion
 
@@ -45,7 +45,7 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        await Send(RoomDragListResCmd.Response(roomDragList.page, roomDragList.pageSplit, roomDragList.listType), client);
+        await SendToClient(RoomDragListResCmd.Response(roomDragList.page, roomDragList.pageSplit, roomDragList.listType), client);
     }
 
     public static async Task OnRoomCreate(UnPacker unPacker, Client client)
@@ -59,13 +59,24 @@ internal static class LobbyCmdImpl
         if (!Room.TryCreate(cmd, out var room, client))
         {
             LobbyUtils.Log("Couldnt create new room. (full?)", ConsoleColor.Red);
-            await Send(RoomCreateResCmd.Response(RoomCreateResCmd.Result.full, 0), client);
+            await SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.full, 0), client);
             return;
         }
 
-        await Send(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
+        await SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
 
-        await Send(RoomJoinNotifyCmd.Notify(client), client);
+        await SendToClient(RoomJoinNotifyCmd.Notify(client), client);
+    }
+
+    public static void OnRoomLeave(Client client)
+    {
+        if (client.room == null)
+        {
+            Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
+            return;
+        }
+
+        _ = client.RemoveFromRoom();
     }
 
     public static async Task OnRoomSetVar(UnPacker unPacker, Client client)
@@ -83,10 +94,10 @@ internal static class LobbyCmdImpl
         }
 
         foreach (Client c in client.room.clients)
-            _ = Send(RoomVarNotifyCmd.Response(client.id, cmd.key, cmd.var), c);
+            _ = SendToClient(RoomVarNotifyCmd.Response(client.id, cmd.key, cmd.var), c);
     }
 
-    static async Task Send(Packet packet, Client client)
+    public static async Task SendToClient(Packet packet, Client client)
     {
         LobbyUtils.Encrypt(packet, Lobby.blowFish);
 

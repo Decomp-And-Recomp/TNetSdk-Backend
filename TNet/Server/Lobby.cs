@@ -71,7 +71,7 @@ internal static class Lobby
 
         bool added = false;
 
-        for (ushort i = 1; i < ushort.MaxValue; i++)
+        for (ushort i = 0; i < ushort.MaxValue; i++)
         {
             if (!clients.TryAdd(i, client)) continue;
 
@@ -131,16 +131,18 @@ internal static class Lobby
             return;
         }
 
-        CMD command = (CMD)unPacker.GetCmd();
+        RoomCMD command = (RoomCMD)unPacker.GetCmd();
 
         LobbyUtils.Log($"Protocol-{unPacker.GetProtocol()} Cmd-{unPacker.GetCmd()}", ConsoleColor.Cyan);
 
         if (unPacker.GetProtocol() == 1)
         {
-            switch (command) // sys commands
+            SysCMD sysCommand = (SysCMD)unPacker.GetCmd();
+
+            switch (sysCommand) // sys commands
             {
-                case CMD.sys_heartbeat: await LobbyCmdImpl.OnSystemHeartbeat(unPacker, client); return; // CMD.sys_heartbeat
-                case CMD.sys_login: await LobbyCmdImpl.OnSystemPlayerLogin(unPacker, client); return;
+                case SysCMD.heartbeat: await LobbyCmdImpl.OnSystemHeartbeat(unPacker, client); return; // CMD.sys_heartbeat
+                case SysCMD.login: await LobbyCmdImpl.OnSystemPlayerLogin(unPacker, client); return;
             }
 
             LobbyUtils.LogUnimpl(unPacker.GetProtocol() + ":" + unPacker.GetCmd());
@@ -149,9 +151,10 @@ internal static class Lobby
 
         switch (command) // room commands
         {
-            case CMD.room_drag_list: await LobbyCmdImpl.OnRoomDragList(unPacker, client); return;
-            case CMD.room_create: await LobbyCmdImpl.OnRoomCreate(unPacker, client); return;
-            case CMD.room_set_var: await LobbyCmdImpl.OnRoomSetVar(unPacker, client); return;
+            case RoomCMD.room_drag_list: await LobbyCmdImpl.OnRoomDragList(unPacker, client); return;
+            case RoomCMD.room_create: await LobbyCmdImpl.OnRoomCreate(unPacker, client); return;
+            case RoomCMD.room_leave: LobbyCmdImpl.OnRoomLeave(client); return;
+            case RoomCMD.room_set_var: await LobbyCmdImpl.OnRoomSetVar(unPacker, client); return;
         }
 
         LobbyUtils.LogUnimpl(unPacker.GetProtocol() + ":" + unPacker.GetCmd());
@@ -165,6 +168,7 @@ internal static class Lobby
     public static void DisconnectClient(Client client, DisconnectCode code)
     {
         LobbyUtils.Log("Disconnected player: " + code);
+        if (code == DisconnectCode.SuspiciousRequests) Debug.LogStackFull(ConsoleColor.DarkMagenta);
         client.Disconnect();
     }
 }

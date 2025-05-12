@@ -1,11 +1,9 @@
-using TNet.Server.Binary;
-
 namespace TNet.Server.Cmd;
 
 internal class RoomDestroyCmd : RoomCmd
 {
-	public Packet MakePacket()
+	/*public Packet MakePacket()
 	{
-		return MakePacket(CMD.sys_logout);
-	}
+		return MakePacket(RoomCMD.sys_logout);
+	}*/
 }

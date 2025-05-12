@@ -15,6 +15,6 @@ internal class RoomCommentChangeReqCmd : RoomCmd
 
 	public Packet MakePacket()
 	{
-		return MakePacket(CMD.room_set_create_param);
+		return MakePacket(RoomCMD.room_set_create_param);
 	}
 }

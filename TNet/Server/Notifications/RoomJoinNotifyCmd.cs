@@ -5,6 +5,8 @@ namespace TNet.Server.Notifications;
 
 internal static class RoomJoinNotifyCmd
 {
+    /// <summary>Creates an notification for all people, that this person joined in the room.
+    /// Uses <see cref="Client.room"/> for the room some meta.</summary>
     public static Packet Notify(Client client)
     {
         if (client.room == null)
@@ -17,6 +19,6 @@ internal static class RoomJoinNotifyCmd
 
         packer.PushUInt16((ushort)client.room.clients.IndexOf(client));
 
-        return packer.MakePacket(Protocol.room, CMD.room_join_notify);
+        return packer.MakePacket(Protocol.room, RoomCMD.room_join_notify);
     }
 }

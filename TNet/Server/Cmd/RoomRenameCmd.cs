@@ -14,6 +14,6 @@ internal class RoomRenameCmd : RoomCmd
 
 	public Packet MakePacket()
 	{
-		return MakePacket(CMD.room_rename);
+		return MakePacket(RoomCMD.room_rename);
 	}
 }

@@ -18,6 +18,6 @@ internal static class RoomCreateResCmd
         resultPacket.PushUInt16((ushort)result);
         resultPacket.PushUInt16(roomId);
 
-        return resultPacket.MakePacket(2, (ushort)CMD.room_create_res);
+        return resultPacket.MakePacket(2, (ushort)RoomCMD.room_create_res);
     }
 }
