@@ -59,8 +59,6 @@ internal class Room : IDisposable, IAsyncDisposable
         room.owner = owner;
         room.ConnectClient(owner);
 
-        owner.room = room;
-
         room.state = State.open;
 
         return true;
@@ -77,6 +75,8 @@ internal class Room : IDisposable, IAsyncDisposable
         _ = SendToAll(RoomJoinNotifyCmd.Notify(client));
 
         clients.Add(client);
+
+        client.room = this;
 
         Packet joinRes = RoomJoinResCmd.Response(RoomJoinResult.ok, (ushort)clients.IndexOf(client), SerializedRoomInfo.FromRoom(this));
 
