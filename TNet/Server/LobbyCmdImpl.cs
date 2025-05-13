@@ -94,7 +94,7 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        room.ConnectClient(client);
+        _ = room.ConnectClient(client);
     }
 
     public static void OnRoomLeave(Client client)
@@ -122,29 +122,24 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        Packet p = RoomVarNotifyCmd.Notify(client.id, cmd.key, cmd.var);
-
-        _ = client.room.SendToAll(p);
+        _ = client.room.SetRoomVariable(client.id, cmd.key, cmd.var);
     }
 
-    public static async Task OnUserSetVar(UnPacker unPacker, Client client)
+    public static void OnRoomSetUserVar(UnPacker unPacker, Client client)
     {
-        /*
         if (!RoomSetUserVarCmd.TryParse(unPacker, out var cmd))
         {
-            LobbyUtils.LogBadUnpacker("OnUserSetVar");
+            LobbyUtils.LogBadUnpacker("OnRoomSetUserVar");
             return;
         }
 
-        if (cmd.var == null || client.room == null)
+        if (cmd.data == null || client.room == null)
         {
             Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
             return;
         }
 
-        foreach (Client c in client.room.clients)
-            _ = LobbyUtils.SendToClient(RoomVarNotifyCmd.Response(client.id, cmd.key, cmd.var), c);
-        */
+        _ = client.room.SetUserVariable(client.id, cmd.key, cmd.data);
     }
 
     public static async Task OnRoomBroadcastMsg(UnPacker unPacker, Client client)

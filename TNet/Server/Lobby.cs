@@ -157,6 +157,7 @@ internal static class Lobby
             case RoomCMD.join: LobbyCmdImpl.OnRoomJoin(unPacker, client); return;
             case RoomCMD.leave: LobbyCmdImpl.OnRoomLeave(client); return;
             case RoomCMD.set_var: LobbyCmdImpl.OnRoomSetVar(unPacker, client); return;
+            case RoomCMD.set_user_var: LobbyCmdImpl.OnRoomSetUserVar(unPacker, client); return;
             case RoomCMD.broadcast_msg: _ = LobbyCmdImpl.OnRoomBroadcastMsg(unPacker, client); return;
         }
 
@@ -171,7 +172,11 @@ internal static class Lobby
     public static void DisconnectClient(Client client, DisconnectCode code)
     {
         LobbyUtils.Log("Disconnected player: " + code);
-        if (code == DisconnectCode.SuspiciousRequests) Debug.LogStackFull(ConsoleColor.DarkMagenta);
+        if (code == DisconnectCode.SuspiciousRequests)
+        {
+            Debug.LogStackFull(ConsoleColor.DarkMagenta);
+            return;
+        }
         client.Disconnect();
     }
 }

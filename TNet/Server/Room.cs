@@ -8,6 +8,12 @@ namespace TNet.Server;
 
 internal class Room : IDisposable, IAsyncDisposable
 {
+    struct VariableSet
+    {
+        public ushort userId;
+        public byte[] data;
+    }
+
     public enum State { open, started, shuttingDown, close }
 
     public State state { get; private set; }
@@ -26,6 +32,11 @@ internal class Room : IDisposable, IAsyncDisposable
     public RoomType roomType;
 
     public bool isFull => clients.Count >= maxUsers;
+
+    Dictionary<ushort, VariableSet> vars = [];
+
+    // Dictionary<Client, VariableSet>, optimise it to empty the data when player leaves
+    Dictionary<ushort, VariableSet> userVars = [];
 
     Room() { }
 
@@ -83,6 +94,7 @@ internal class Room : IDisposable, IAsyncDisposable
         await SendToAll(RoomJoinNotifyCmd.Notify(client));
 
         // sending every player to new player manualy
+        // then syncing other stuff
         for (int i = 0;  i < clients.Count; i++)
         {
             if (clients[i] == client) continue;
@@ -90,9 +102,19 @@ internal class Room : IDisposable, IAsyncDisposable
             await LobbyUtils.SendToClient(RoomJoinNotifyCmd.Notify(clients[i]), client);
         }
 
+        foreach (var v in vars)
+        {
+            await LobbyUtils.SendToClient(RoomVarNotifyCmd.Notify(v.Value.userId, v.Key, v.Value.data), client);
+        }
+
+        foreach (var v in userVars)
+        {
+            await LobbyUtils.SendToClient(RoomUserVarNotifyCmd.Notify(v.Value.userId, v.Key, v.Value.data), client);
+        }
+
         Debug.LogInfo("Client connected, count: " + clients.Count);
 
-        if (clients.Count > 1 && state == State.open) await Start(owner);
+        if (clients.Count > 2 && state == State.open) await Start(owner);
     }
 
     public async Task ShutDown()
@@ -146,6 +168,32 @@ internal class Room : IDisposable, IAsyncDisposable
         Debug.LogInfo("No room owner.");
 
         await ShutDown();
+    }
+
+    public async Task SetRoomVariable(ushort userId, ushort key, byte[] var)
+    {
+        Debug.LogInfo("Set room variable");
+
+        vars[key] = new()
+        { 
+            userId = userId,
+            data = var
+        };
+
+        await SendToAll(RoomVarNotifyCmd.Notify(userId, key, var));
+    }
+
+    public async Task SetUserVariable(ushort userId, ushort key, byte[] var)
+    {
+        Debug.LogInfo("Set user variable");
+
+        userVars[key] = new()
+        { 
+            userId = userId,
+            data = var
+        };
+
+        await SendToAll(RoomUserVarNotifyCmd.Notify(userId, key, var));
     }
 
     public async Task Start(Client startedBy)

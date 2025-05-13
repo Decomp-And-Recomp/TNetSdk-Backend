@@ -17,11 +17,11 @@ internal class RoomSetVarCmd
         if (!unPacker.PopUInt16(ref cmd.key)) return false;
 
         ushort length = 0;
-        unPacker.PopUInt16(ref length);
+        if (!unPacker.PopUInt16(ref length)) return false;
 
         cmd.var = new byte[length];
 
-        unPacker.PopByteArray(ref cmd.var, length);
+        if (!unPacker.PopByteArray(ref cmd.var, length)) return false;
 
         return true;
     }
