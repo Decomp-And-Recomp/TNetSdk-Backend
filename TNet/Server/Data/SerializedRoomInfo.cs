@@ -24,31 +24,20 @@ internal struct SerializedRoomInfo
         }
 
         byte[] ownerNameArray = new byte[16], roomNameArray = new byte[16], roomCommentArray = new byte[64];
+
         byte[] tempArray;
 
-        tempArray = Encoding.ASCII.GetBytes(room.owner.nickname);
-
+        tempArray = Encoding.ASCII.GetBytes(room.owner.nickname ?? "");
         for (int i = 0; i < ownerNameArray.Length; i++)
-        {
-            if (tempArray.Length >= i) ownerNameArray[i] = 0;
-            else ownerNameArray[i] = tempArray[i];
-        }
+            ownerNameArray[i] = i < tempArray.Length ? tempArray[i] : (byte)0;
 
-        tempArray = Encoding.ASCII.GetBytes(room.name);
-
+        tempArray = Encoding.ASCII.GetBytes(room.name ?? "");
         for (int i = 0; i < roomNameArray.Length; i++)
-        {
-            if (tempArray.Length >= i) roomNameArray[i] = 0;
-            else roomNameArray[i] = tempArray[i];
-        }
+            roomNameArray[i] = i < tempArray.Length ? tempArray[i] : (byte)0;
 
-        tempArray = Encoding.ASCII.GetBytes(room.comment);
-
+        tempArray = Encoding.ASCII.GetBytes(room.comment ?? "");
         for (int i = 0; i < roomCommentArray.Length; i++)
-        {
-            if (tempArray.Length >= i) roomCommentArray[i] = 0;
-            else roomCommentArray[i] = tempArray[i];
-        }
+            roomCommentArray[i] = i < tempArray.Length ? tempArray[i] : (byte)0;
 
         return new()
         {
@@ -58,10 +47,11 @@ internal struct SerializedRoomInfo
             onlineUsers = (ushort)room.clients.Count,
             maxUsers = room.maxUsers,
             state = room.state == Room.State.started ? (ushort)1 : (ushort)0,
-            passworded = 0, //ToDo: passworded serialization, doesnt need for TLCK
+            passworded = 0,
             creatorName = ownerNameArray,
             roomName = roomNameArray,
             roomComment = roomCommentArray
         };
     }
+
 }

@@ -10,18 +10,26 @@ internal static class RoomJoinResCmd
 	{
 		Packer packer = new();
 
-		packer.PushUInt16((ushort)result);
-		packer.PushUInt16(sitPos);
+		try
+        {
+            packer.PushUInt16((ushort)result);
+            packer.PushUInt16(sitPos);
 
-		packer.PushUInt16(roomInfo.roomId);
-		packer.PushUInt16(roomInfo.masterId);
-		packer.PushUInt16(roomInfo.onlineUsers);
-		packer.PushUInt16(roomInfo.maxUsers);
-		packer.PushUInt16(roomInfo.state);
-		packer.PushUInt16(roomInfo.passworded);
-		packer.PushByteArray(roomInfo.creatorName, 16);
-		packer.PushByteArray(roomInfo.roomName, 16);
-		packer.PushByteArray(roomInfo.roomComment, 64);
+            packer.PushUInt16(roomInfo.roomId);
+            packer.PushUInt16(roomInfo.masterId);
+            packer.PushUInt16(roomInfo.onlineUsers);
+            packer.PushUInt16(roomInfo.maxUsers);
+            packer.PushUInt16(roomInfo.state);
+            packer.PushUInt16(roomInfo.passworded);
+
+            packer.PushByteArray(roomInfo.creatorName, 16);
+            packer.PushByteArray(roomInfo.roomName, 16);
+            packer.PushByteArray(roomInfo.roomComment, 64);
+        }
+		catch (Exception e)
+		{
+			Debug.LogException(e);
+		}
 
 		return packer.MakePacket(RoomCMD.join_res);
 	}

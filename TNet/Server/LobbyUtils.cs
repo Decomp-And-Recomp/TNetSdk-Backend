@@ -54,19 +54,35 @@ internal class LobbyUtils
 
     public static async Task SendToClient(Packet packet, Client client)
     {
+        if (!client.connection.Connected)
+        {
+            Debug.LogError("Client disconnected");
+            return;
+        }
+
+        client.connection.SendTimeout = 3000;
+
         Encrypt(packet, Lobby.blowFish);
 
         byte[] bytes = new byte[packet.Length];
 
         packet.Position = 0;
 
-        if (!packet.PopByteArray(ref bytes, packet.Length - 1))
+        if (!packet.PopByteArray(ref bytes, packet.Length))
         {
             Debug.LogError("Packet Fail");
             return;
         }
 
-        await client.connection.GetStream().WriteAsync(bytes);
+        try
+        {
+            await client.connection.GetStream().WriteAsync(bytes);
+            Debug.LogInfo("Sent");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException("Send failed: ", ex);
+        }
     }
     /*
      		    uint num = (uint)((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);

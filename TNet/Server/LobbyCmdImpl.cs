@@ -63,9 +63,15 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
 
-        _ = room.Start(client);
+        // second var is 0 cuz.. its owner, otherwise use index of client from clients.
+        Packet joinRes = RoomJoinResCmd.Response(RoomJoinResult.ok, 0, SerializedRoomInfo.FromRoom(room));
+
+        await LobbyUtils.SendToClient(joinRes, client);
+
+        //await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
+
+        //_ = room.Start(client);
         //await SendToClient(RoomJoinNotifyCmd.Notify(client), client);
     }
 
@@ -99,20 +105,6 @@ internal static class LobbyCmdImpl
     }
 
     [Obsolete("Use one in LobbyUtils instead.")]
-    public static async Task SendToClient(Packet packet, Client client)
-    {
-        LobbyUtils.Encrypt(packet, Lobby.blowFish);
-
-        byte[] bytes = new byte[packet.Length];
-
-        packet.Position = 0;
-
-        if (!packet.PopByteArray(ref bytes, packet.Length-1))
-        {
-            Debug.LogError("Packet Fail");
-            return;
-        }
-
-        await client.connection.GetStream().WriteAsync(bytes);
-    }
+    public static async Task SendToClient(Packet packet, Client client) 
+        => await LobbyUtils.SendToClient(packet, client);
 }

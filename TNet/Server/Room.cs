@@ -59,11 +59,6 @@ internal class Room : IDisposable, IAsyncDisposable
 
         owner.room = room;
 
-        // second var is 0 cuz.. its owner, otherwise use index of client from clients.
-        Packet joinRes = RoomJoinResCmd.Response(RoomJoinResult.ok, 0, SerializedRoomInfo.FromRoom(room));
-
-        _ = LobbyCmdImpl.SendToClient(joinRes, owner);
-
         room.state = State.open;
 
         return true;
@@ -73,9 +68,9 @@ internal class Room : IDisposable, IAsyncDisposable
     {
         clients.Add(client);
 
-        Packet notification = RoomJoinNotifyCmd.Notify(client);
+        //Packet notification = RoomJoinNotifyCmd.Notify(client);
 
-        foreach (Client c in clients) _ = LobbyCmdImpl.SendToClient(notification, c);
+        //foreach (Client c in clients) _ = LobbyUtils.SendToClient(notification, c);
     }
 
     public async Task ShutDown()
