@@ -1,4 +1,5 @@
 ﻿using TNet.Server.Binary;
+using TNet.Server.Cmd;
 using TNet.Server.Data;
 using TNet.Server.Notifications;
 using TNet.Server.Requests;
@@ -11,7 +12,7 @@ internal class Room : IDisposable, IAsyncDisposable
 
     public State state { get; private set; }
 
-    public ushort id;
+    public ushort id, maxUsers, groupId;
 
     public string name = string.Empty;
     public string comment = string.Empty;
@@ -46,19 +47,35 @@ internal class Room : IDisposable, IAsyncDisposable
 
         room.name = cmd.roomName;
         room.comment = cmd.param;
+        room.maxUsers = cmd.maxUsers;
+        room.groupId = cmd.groupId;
         room.masterSwitchType = cmd.roomSwitchMasterType;
         room.roomType = cmd.roomType;
 
         LobbyUtils.Log($"Created new room with: {room.id}, {room.masterSwitchType}, {room.roomType}", ConsoleColor.Cyan);
 
         room.owner = owner;
-        room.clients.Add(owner);
+        room.ConnectClient(owner);
 
         owner.room = room;
+
+        // second var is 0 cuz.. its owner, otherwise use index of client from clients.
+        Packet joinRes = RoomJoinResCmd.Response(RoomJoinResult.ok, 0, SerializedRoomInfo.FromRoom(room));
+
+        _ = LobbyCmdImpl.SendToClient(joinRes, owner);
 
         room.state = State.open;
 
         return true;
+    }
+
+    public void ConnectClient(Client client)
+    {
+        clients.Add(client);
+
+        Packet notification = RoomJoinNotifyCmd.Notify(client);
+
+        foreach (Client c in clients) _ = LobbyCmdImpl.SendToClient(notification, c);
     }
 
     public async Task ShutDown()

@@ -65,7 +65,8 @@ internal static class LobbyCmdImpl
 
         await SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
 
-        await SendToClient(RoomJoinNotifyCmd.Notify(client), client);
+        _ = room.Start(client);
+        //await SendToClient(RoomJoinNotifyCmd.Notify(client), client);
     }
 
     public static void OnRoomLeave(Client client)

@@ -1,54 +1,67 @@
-﻿namespace TNet.Server.Data;
+﻿using System.Text;
 
-internal readonly struct SerializedRoomInfo
+namespace TNet.Server.Data;
+
+internal struct SerializedRoomInfo
 {
-    /*internal class RoomInfo
-    {
-        public ushort m_room_id;
-
-        public ushort m_group_id;
-
-        public ushort m_master_id;
-
-        public ushort m_online_user;
-
-        public ushort m_max_user;
-
-        public ushort m_state;
-
-        public ushort m_passworded;
-
-        public string m_room_name;
-
-        public string m_creater_name;
-
-        public string m_comment;
-    }*/
-
-    public readonly ushort roomId;
-    public readonly ushort groupId;
-    public readonly ushort masterId; // master client id
-    public readonly ushort onlineUsers;
-    public readonly ushort maxUsers;
-    public readonly ushort state; //TNetRoom.isGaming (Client)
-    public readonly ushort passworded;
-    public readonly byte[] roomName;
-    public readonly byte[] creatorName;
-    public readonly byte[] roomComment;
+    public ushort roomId {  get; private set; }
+    public ushort groupId { get; private set; }
+    public ushort masterId { get; private set; } // master client id
+    public ushort onlineUsers { get; private set; }
+    public ushort maxUsers { get; private set; }
+    public ushort state { get; private set; } //TNetRoom.isGaming (Client)
+    public ushort passworded { get; private set; }                                                                      
+    public byte[] roomName { get; private set; }
+    public byte[] creatorName { get; private set; }
+    public byte[] roomComment { get; private set; }
 
     public static SerializedRoomInfo FromRoom(Room room)
     {
-        /*
-            roomInfo.m_creater_name = Encoding.ASCII.GetString(ByteArray(), Offset, 16);
-            roomInfo.m_creater_name = roomInfo.m_creater_name.Substring(0, roomInfo.m_creater_name.IndexOf('\0'));
-            Offset += 16;
-            roomInfo.m_room_name = Encoding.ASCII.GetString(ByteArray(), Offset, 16);
-            roomInfo.m_room_name = roomInfo.m_room_name.Substring(0, roomInfo.m_room_name.IndexOf('\0'));
-            Offset += 16;
-            roomInfo.m_comment = Encoding.ASCII.GetString(ByteArray(), Offset, 64);
-            roomInfo.m_comment = roomInfo.m_comment.Substring(0, roomInfo.m_comment.IndexOf('\0'));
-            Offset += 64;
-         */
-        return new();
+        if (room.owner == null)
+        {
+            Debug.LogError("Cannot create SerializedRoomInfo without owner being set, this CANNOT happen and requires attention.");
+            return new();
+        }
+
+        byte[] ownerNameArray = new byte[16], roomNameArray = new byte[16], roomCommentArray = new byte[64];
+        byte[] tempArray;
+
+        tempArray = Encoding.ASCII.GetBytes(room.owner.nickname);
+
+        for (int i = 0; i < ownerNameArray.Length; i++)
+        {
+            if (tempArray.Length >= i) ownerNameArray[i] = 0;
+            else ownerNameArray[i] = tempArray[i];
+        }
+
+        tempArray = Encoding.ASCII.GetBytes(room.name);
+
+        for (int i = 0; i < roomNameArray.Length; i++)
+        {
+            if (tempArray.Length >= i) roomNameArray[i] = 0;
+            else roomNameArray[i] = tempArray[i];
+        }
+
+        tempArray = Encoding.ASCII.GetBytes(room.comment);
+
+        for (int i = 0; i < roomCommentArray.Length; i++)
+        {
+            if (tempArray.Length >= i) roomCommentArray[i] = 0;
+            else roomCommentArray[i] = tempArray[i];
+        }
+
+        return new()
+        {
+            roomId = room.id,
+            groupId = room.groupId,
+            masterId = room.owner.id,
+            onlineUsers = (ushort)room.clients.Count,
+            maxUsers = room.maxUsers,
+            state = room.state == Room.State.started ? (ushort)1 : (ushort)0,
+            passworded = 0, //ToDo: passworded serialization, doesnt need for TLCK
+            creatorName = ownerNameArray,
+            roomName = roomNameArray,
+            roomComment = roomCommentArray
+        };
     }
 }

@@ -19,6 +19,6 @@ internal static class RoomJoinNotifyCmd
 
         packer.PushUInt16((ushort)client.room.clients.IndexOf(client));
 
-        return packer.MakePacket(Protocol.room, RoomCMD.join_notify);
+        return packer.MakePacket(RoomCMD.join_notify);
     }
 }
