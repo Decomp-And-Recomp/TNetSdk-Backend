@@ -98,6 +98,7 @@ internal static class LobbyCmdImpl
             _ = SendToClient(RoomVarNotifyCmd.Response(client.id, cmd.key, cmd.var), c);
     }
 
+    [Obsolete("Use on in LobbyUtils instead.")]
     public static async Task SendToClient(Packet packet, Client client)
     {
         LobbyUtils.Encrypt(packet, Lobby.blowFish);

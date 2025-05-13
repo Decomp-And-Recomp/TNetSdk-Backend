@@ -38,6 +38,7 @@ internal class LobbyUtils
         packet.Position = 0;
         packet.PushUInt64(val);
     }
+
 #pragma warning disable
     public static void Encrypt(Packet packet, BlowFish fish)
     {
@@ -51,6 +52,22 @@ internal class LobbyUtils
     }
 #pragma warning restore
 
+    public static async Task SendToClient(Packet packet, Client client)
+    {
+        Encrypt(packet, Lobby.blowFish);
+
+        byte[] bytes = new byte[packet.Length];
+
+        packet.Position = 0;
+
+        if (!packet.PopByteArray(ref bytes, packet.Length - 1))
+        {
+            Debug.LogError("Packet Fail");
+            return;
+        }
+
+        await client.connection.GetStream().WriteAsync(bytes);
+    }
     /*
      		    uint num = (uint)((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
 				uint num2 = (uint)((data[4] << 24) | (data[5] << 16) | (data[6] << 8) | data[7]);
