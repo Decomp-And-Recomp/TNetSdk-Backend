@@ -72,11 +72,11 @@ internal class Room : IDisposable, IAsyncDisposable
 
     public void ConnectClient(Client client)
     {
+        client.room = this;
+
         _ = SendToAll(RoomJoinNotifyCmd.Notify(client));
 
         clients.Add(client);
-
-        client.room = this;
 
         Packet joinRes = RoomJoinResCmd.Response(RoomJoinResult.ok, (ushort)clients.IndexOf(client), SerializedRoomInfo.FromRoom(this));
 

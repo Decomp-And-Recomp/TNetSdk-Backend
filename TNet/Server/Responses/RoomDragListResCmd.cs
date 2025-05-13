@@ -23,6 +23,8 @@ internal static class RoomDragListResCmd
 
         packer.PushUInt16((ushort)list.Count); // sent rooms length
 
+        Debug.LogInfo("Room count: " + list.Count);
+
         SerializedRoomInfo info;
 
         for (int i = 0; i < list.Count; i++)

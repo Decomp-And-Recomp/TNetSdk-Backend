@@ -10,7 +10,10 @@ internal static class RoomJoinNotifyCmd
     public static Packet Notify(Client client)
     {
         if (client.room == null)
+        {
+            Debug.LogError("Client does not have a room assigned.");
             throw new Exception("Client does not have a room assigned.");
+        }
 
         Packer packer = new();
 

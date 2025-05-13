@@ -7,8 +7,8 @@ namespace TNet.Server.Cmd;
 internal static class RoomJoinResCmd
 {
 	public static Packet Response(RoomJoinResult result, ushort sitPos, SerializedRoomInfo roomInfo)
-	{
-		Packer packer = new();
+    {
+        Packer packer = new();
 
         packer.PushUInt16((ushort)result);
         packer.PushUInt16(sitPos);
