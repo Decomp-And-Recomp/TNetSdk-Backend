@@ -54,10 +54,10 @@ internal class Room : IDisposable, IAsyncDisposable
         room.masterSwitchType = cmd.roomSwitchMasterType;
         room.roomType = cmd.roomType;
 
-        LobbyUtils.Log($"Created new room with: {room.id}, {room.masterSwitchType}, {room.roomType}", ConsoleColor.Cyan);
+        LobbyUtils.Log($"Created new room with: id={room.id}, maxUsers={room.maxUsers}, {room.masterSwitchType}, {room.roomType}", ConsoleColor.Cyan);
 
         room.owner = owner;
-        room.ConnectClient(owner);
+        _ = room.ConnectClient(owner);
 
         room.state = State.open;
 
@@ -70,17 +70,29 @@ internal class Room : IDisposable, IAsyncDisposable
             await LobbyUtils.SendToClient(packet, c);
     }
 
-    public void ConnectClient(Client client)
+    public async Task ConnectClient(Client client)
     {
         client.room = this;
-
-        _ = SendToAll(RoomJoinNotifyCmd.Notify(client));
 
         clients.Add(client);
 
         Packet joinRes = RoomJoinResCmd.Response(RoomJoinResult.ok, (ushort)clients.IndexOf(client), SerializedRoomInfo.FromRoom(this));
 
-        _ = LobbyUtils.SendToClient(joinRes, client);
+        await LobbyUtils.SendToClient(joinRes, client);
+
+        await SendToAll(RoomJoinNotifyCmd.Notify(client));
+
+        // sending every player to new player manualy
+        for (int i = 0;  i < clients.Count; i++)
+        {
+            if (clients[i] == client) continue;
+
+            await LobbyUtils.SendToClient(RoomJoinNotifyCmd.Notify(clients[i]), client);
+        }
+
+        Debug.LogInfo("Client connected, count: " + clients.Count);
+
+        if (clients.Count > 1 && state == State.open) await Start(owner);
     }
 
     public async Task ShutDown()
@@ -146,6 +158,7 @@ internal class Room : IDisposable, IAsyncDisposable
 
         if (!clients.Contains(startedBy))
         {
+            Debug.LogWarning("Lobby started by someone not in the room: " + state);
             Lobby.DisconnectClient(startedBy, DisconnectCode.SuspiciousRequests);
             return;
         }
@@ -154,7 +167,7 @@ internal class Room : IDisposable, IAsyncDisposable
 
         Packet notification = RoomStartNotifyCmd.Notify(startedBy.id);
 
-        foreach (Client c in clients) await LobbyCmdImpl.SendToClient(notification, c);
+        await SendToAll(notification);
     }
 
     public bool TryChangeOwner(Client newOwner)

@@ -14,6 +14,7 @@ internal static class RoomJoinResCmd
         packer.PushUInt16(sitPos);
 
         packer.PushUInt16(roomInfo.roomId);
+        packer.PushUInt16(roomInfo.groupId);
         packer.PushUInt16(roomInfo.masterId);
         packer.PushUInt16(roomInfo.onlineUsers);
         packer.PushUInt16(roomInfo.maxUsers);
