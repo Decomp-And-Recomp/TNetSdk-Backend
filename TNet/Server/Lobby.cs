@@ -111,11 +111,11 @@ internal static class Lobby
                 break;
             }
 
-            await OnReceive(buffer[..read], client);
+            OnReceive(buffer[..read], client);
         }
     }
 
-    static async Task OnReceive(byte[] bytes, Client client)
+    static void OnReceive(byte[] bytes, Client client)
     {
         UnPacker unPacker = new();
         
@@ -140,8 +140,8 @@ internal static class Lobby
 
             switch (sysCommand) // sys commands
             {
-                case SysCMD.heartbeat: await LobbyCmdImpl.OnSystemHeartbeat(unPacker, client); return; // CMD.sys_heartbeat
-                case SysCMD.login: await LobbyCmdImpl.OnSystemPlayerLogin(unPacker, client); return;
+                case SysCMD.heartbeat: _ = LobbyCmdImpl.OnSystemHeartbeat(unPacker, client); return; // CMD.sys_heartbeat
+                case SysCMD.login: _ = LobbyCmdImpl.OnSystemPlayerLogin(unPacker, client); return;
             }
 
             LobbyUtils.LogUnimpl(sysCommand);
