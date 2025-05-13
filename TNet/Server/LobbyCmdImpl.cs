@@ -16,7 +16,7 @@ internal static class LobbyCmdImpl
         ushort ping = 0;
         unPacker.PopUInt16(ref ping);
 
-        await SendToClient(SysHeartbeatResCmd.Response(0), client);
+        await LobbyUtils.SendToClient(SysHeartbeatResCmd.Response(0), client);
     }
 
     public static async Task OnSystemPlayerLogin(UnPacker unPacker, Client client)
@@ -33,7 +33,7 @@ internal static class LobbyCmdImpl
 
         LobbyUtils.Log($"New user '{request.account}' idenefied as \"{request.nickname}\"");
 
-        await SendToClient(SysLoginResCmd.Response(LoginResult.ok, client.id, request.nickname), client);
+        await LobbyUtils.SendToClient(SysLoginResCmd.Response(LoginResult.ok, client.id, request.nickname), client);
     }
     #endregion
 
@@ -45,7 +45,7 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        await SendToClient(RoomDragListResCmd.Response(roomDragList.page, roomDragList.pageSplit, roomDragList.listType), client);
+        await LobbyUtils.SendToClient(RoomDragListResCmd.Response(roomDragList.page, roomDragList.pageSplit, roomDragList.listType), client);
     }
 
     public static async Task OnRoomCreate(UnPacker unPacker, Client client)
@@ -59,11 +59,11 @@ internal static class LobbyCmdImpl
         if (!Room.TryCreate(cmd, out var room, client))
         {
             LobbyUtils.Log("Couldnt create new room. (full?)", ConsoleColor.Red);
-            await SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.full, 0), client);
+            await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.full, 0), client);
             return;
         }
 
-        await SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
+        await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
 
         _ = room.Start(client);
         //await SendToClient(RoomJoinNotifyCmd.Notify(client), client);
@@ -95,10 +95,10 @@ internal static class LobbyCmdImpl
         }
 
         foreach (Client c in client.room.clients)
-            _ = SendToClient(RoomVarNotifyCmd.Response(client.id, cmd.key, cmd.var), c);
+            _ = LobbyUtils.SendToClient(RoomVarNotifyCmd.Response(client.id, cmd.key, cmd.var), c);
     }
 
-    [Obsolete("Use on in LobbyUtils instead.")]
+    [Obsolete("Use one in LobbyUtils instead.")]
     public static async Task SendToClient(Packet packet, Client client)
     {
         LobbyUtils.Encrypt(packet, Lobby.blowFish);
