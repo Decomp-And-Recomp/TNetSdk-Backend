@@ -66,7 +66,35 @@ internal static class LobbyCmdImpl
         await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
 
         //_ = room.Start(client);
-        //await SendToClient(RoomJoinNotifyCmd.Notify(client), client);
+    }
+
+    public static void OnRoomJoin(UnPacker unPacker, Client client)
+    {
+        if (!RoomJoinCmd.TryParse(unPacker, out var cmd))
+        {
+            LobbyUtils.LogBadUnpacker("OnRoomJoin");
+            return;
+        }
+
+        if (!Lobby.rooms.TryGetValue(cmd.roomId, out var room))
+        {
+            _ = LobbyUtils.SendToClient(RoomJoinResCmd.Response(RoomJoinResult.no_exist), client);
+            return;
+        }
+
+        if (room.state == Room.State.started)
+        {
+            _ = LobbyUtils.SendToClient(RoomJoinResCmd.Response(RoomJoinResult.gaming), client);
+            return;
+        }
+
+        if (room.isFull)
+        {
+            _ = LobbyUtils.SendToClient(RoomJoinResCmd.Response(RoomJoinResult.full), client);
+            return;
+        }
+
+        room.ConnectClient(client);
     }
 
     public static void OnRoomLeave(Client client)

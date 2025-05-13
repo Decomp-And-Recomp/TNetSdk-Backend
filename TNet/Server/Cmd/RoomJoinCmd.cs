@@ -6,22 +6,19 @@ namespace TNet.Server.Cmd
 {
 	internal class RoomJoinCmd : RoomCmd
 	{
-		public RoomJoinCmd(ushort room_id, string pwd)
-		{
-			PushUInt16(room_id);
-			if (pwd == null || pwd.Length == 0)
-			{
-				PushUInt16(0);
-				return;
-			}
-			byte[] bytes = Encoding.ASCII.GetBytes(pwd);
-			PushUInt16((ushort)bytes.Length);
-			PushByteArray(bytes, bytes.Length);
-		}
+		public ushort roomId;
+		public string password = string.Empty;
 
-		public Packet MakePacket()
+		RoomJoinCmd() { }
+
+		public static bool TryParse(UnPacker unPacker, out RoomJoinCmd result)
 		{
-			return MakePacket(RoomCMD.join);
+			result = new();
+
+			if (!unPacker.PopUInt16(ref result.roomId)) return false;
+			if (!unPacker.PopString(ref result.password, Encoding.ASCII)) return false;
+
+			return true;
 		}
 	}
 }

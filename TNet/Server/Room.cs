@@ -25,7 +25,7 @@ internal class Room : IDisposable, IAsyncDisposable
 
     public RoomType roomType;
 
-    public Dictionary<ushort, byte[]> vars = new();
+    public bool isFull => clients.Count >= maxUsers;
 
     Room() { }
 
@@ -78,7 +78,6 @@ internal class Room : IDisposable, IAsyncDisposable
 
         clients.Add(client);
 
-        // second var is 0 cuz.. its owner, otherwise use index of client from clients.
         Packet joinRes = RoomJoinResCmd.Response(RoomJoinResult.ok, (ushort)clients.IndexOf(client), SerializedRoomInfo.FromRoom(this));
 
         _ = LobbyUtils.SendToClient(joinRes, client);
