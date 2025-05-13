@@ -69,7 +69,7 @@ internal static class LobbyCmdImpl
 
         await LobbyUtils.SendToClient(joinRes, client);
 
-        //await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
+        await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
 
         //_ = room.Start(client);
         //await SendToClient(RoomJoinNotifyCmd.Notify(client), client);
@@ -102,6 +102,26 @@ internal static class LobbyCmdImpl
 
         foreach (Client c in client.room.clients)
             _ = LobbyUtils.SendToClient(RoomVarNotifyCmd.Response(client.id, cmd.key, cmd.var), c);
+    }
+
+    public static async Task OnUserSetVar(UnPacker unPacker, Client client)
+    {
+        /*
+        if (!RoomSetUserVarCmd.TryParse(unPacker, out var cmd))
+        {
+            LobbyUtils.LogBadUnpacker("OnRoomSetVar");
+            return;
+        }
+
+        if (cmd.var == null || client.room == null)
+        {
+            Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
+            return;
+        }
+
+        foreach (Client c in client.room.clients)
+            _ = LobbyUtils.SendToClient(RoomVarNotifyCmd.Response(client.id, cmd.key, cmd.var), c);
+        */
     }
 
     [Obsolete("Use one in LobbyUtils instead.")]

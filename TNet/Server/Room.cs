@@ -80,6 +80,13 @@ internal class Room : IDisposable, IAsyncDisposable
 
         foreach (Client client in clients) await client.RemoveFromRoom();
 
+        if (Lobby.rooms.Remove(id, out var removedRoom))
+        {
+            // Put it back
+            if (removedRoom != this && removedRoom != null) 
+                Lobby.rooms[id] = removedRoom;
+        }
+
         state = State.close;
     }
 
@@ -98,13 +105,14 @@ internal class Room : IDisposable, IAsyncDisposable
             return;
         }
 
+        // Yes you need to notify the removed player too
+        Packet p = RoomLeaveNotifyCmd.Notify(client.id);
+
+        foreach (Client c in clients) await LobbyUtils.SendToClient(p, c);
+
         clients.Remove(client);
 
         client.room = null;
-
-        Packet p = RoomLeaveNotifyCmd.Notify(client.id);
-
-        foreach (Client c in clients) await LobbyCmdImpl.SendToClient(p, c);
 
         if (owner != client && owner != null) return;
 
