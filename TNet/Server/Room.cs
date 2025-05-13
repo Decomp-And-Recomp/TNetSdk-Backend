@@ -63,6 +63,11 @@ internal class Room : IDisposable, IAsyncDisposable
 
         return true;
     }
+    public async Task SendToAll(Packet packet)
+    {
+        foreach (Client c in clients)
+            await LobbyUtils.SendToClient(packet, c);
+    }
 
     public void ConnectClient(Client client)
     {
@@ -159,13 +164,12 @@ internal class Room : IDisposable, IAsyncDisposable
 
         Packet notification = RoomCreaterChangeNotifyCmd.Notify(owner.id);
 
-        foreach (Client c in clients) _ = LobbyCmdImpl.SendToClient(notification, c);
+        foreach (Client c in clients) _ = LobbyUtils.SendToClient(notification, c);
 
         Debug.LogInfo("Changed lobby owner");
 
         return true;
     }
-
 
 #pragma warning disable CA2012 // Not sure if its good idea tho.
     public void Dispose() => DisposeAsync().GetAwaiter().GetResult();

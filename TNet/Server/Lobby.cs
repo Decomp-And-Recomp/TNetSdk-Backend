@@ -156,6 +156,7 @@ internal static class Lobby
             case RoomCMD.create: _ = LobbyCmdImpl.OnRoomCreate(unPacker, client); return;
             case RoomCMD.leave: LobbyCmdImpl.OnRoomLeave(client); return;
             case RoomCMD.set_var: _ = LobbyCmdImpl.OnRoomSetVar(unPacker, client); return;
+            case RoomCMD.broadcast_msg: _ = LobbyCmdImpl.OnRoomBroadcastMsg(unPacker, client); return;
         }
 
         LobbyUtils.LogUnimpl(command);
