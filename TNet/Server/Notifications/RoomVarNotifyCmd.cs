@@ -10,7 +10,7 @@ internal static class RoomVarNotifyCmd
     /// <param name="key">Key of the variable.</param>
     /// <param name="data">The variable, in bytes.</param>
     /// <returns>A packet that has to be sent to EVERY client in the room.</returns>
-    public static Packet Response(ushort userId, ushort key, byte[] data)
+    public static Packet Notify(ushort userId, ushort key, byte[] data)
     {
         Packer packer = new();
         packer.PushUInt16(userId);
@@ -19,6 +19,6 @@ internal static class RoomVarNotifyCmd
         packer.PushUInt16((ushort)data.Length);
         packer.PushByteArray(data, data.Length);
 
-        return packer.MakePacket(Protocol.room, RoomCMD.var_notify);
+        return packer.MakePacket(RoomCMD.var_notify);
     }
 }

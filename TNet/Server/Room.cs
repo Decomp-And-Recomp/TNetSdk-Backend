@@ -25,6 +25,8 @@ internal class Room : IDisposable, IAsyncDisposable
 
     public RoomType roomType;
 
+    public Dictionary<ushort, byte[]> vars = new();
+
     Room() { }
 
     public static bool TryCreate(RoomCreateCmd cmd, out Room room, Client owner)
@@ -63,6 +65,7 @@ internal class Room : IDisposable, IAsyncDisposable
 
         return true;
     }
+
     public async Task SendToAll(Packet packet)
     {
         foreach (Client c in clients)
@@ -71,11 +74,14 @@ internal class Room : IDisposable, IAsyncDisposable
 
     public void ConnectClient(Client client)
     {
+        _ = SendToAll(RoomJoinNotifyCmd.Notify(client));
+
         clients.Add(client);
 
-        //Packet notification = RoomJoinNotifyCmd.Notify(client);
+        // second var is 0 cuz.. its owner, otherwise use index of client from clients.
+        Packet joinRes = RoomJoinResCmd.Response(RoomJoinResult.ok, (ushort)clients.IndexOf(client), SerializedRoomInfo.FromRoom(this));
 
-        //foreach (Client c in clients) _ = LobbyUtils.SendToClient(notification, c);
+        _ = LobbyUtils.SendToClient(joinRes, client);
     }
 
     public async Task ShutDown()

@@ -63,15 +63,9 @@ internal static class LobbyCmdImpl
             return;
         }
 
-
-        // second var is 0 cuz.. its owner, otherwise use index of client from clients.
-        Packet joinRes = RoomJoinResCmd.Response(RoomJoinResult.ok, 0, SerializedRoomInfo.FromRoom(room));
-
-        await LobbyUtils.SendToClient(joinRes, client);
-
         await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
 
-        _ = room.Start(client);
+        //_ = room.Start(client);
         //await SendToClient(RoomJoinNotifyCmd.Notify(client), client);
     }
 
@@ -86,7 +80,7 @@ internal static class LobbyCmdImpl
         _ = client.RemoveFromRoom();
     }
 
-    public static async Task OnRoomSetVar(UnPacker unPacker, Client client)
+    public static void OnRoomSetVar(UnPacker unPacker, Client client)
     {
         if (!RoomSetVarCmd.TryParse(unPacker, out var cmd))
         {
@@ -100,8 +94,9 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        foreach (Client c in client.room.clients)
-            _ = LobbyUtils.SendToClient(RoomVarNotifyCmd.Response(client.id, cmd.key, cmd.var), c);
+        Packet p = RoomVarNotifyCmd.Notify(client.id, cmd.key, cmd.var);
+
+        _ = client.room.SendToAll(p);
     }
 
     public static async Task OnUserSetVar(UnPacker unPacker, Client client)
@@ -109,7 +104,7 @@ internal static class LobbyCmdImpl
         /*
         if (!RoomSetUserVarCmd.TryParse(unPacker, out var cmd))
         {
-            LobbyUtils.LogBadUnpacker("OnRoomSetVar");
+            LobbyUtils.LogBadUnpacker("OnUserSetVar");
             return;
         }
 
@@ -140,7 +135,7 @@ internal static class LobbyCmdImpl
 
         Packet p = RoomMsgNotifyCmd.Notify(client.id, cmd.bytes);
 
-        client.room.SendToAll(p);
+        _ = client.room.SendToAll(p);
     }
 
     [Obsolete("Use one in LobbyUtils instead.")]
