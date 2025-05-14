@@ -156,4 +156,23 @@ internal static class LobbyCmdImpl
 
         client.room.SendToAll(RoomMsgNotifyCmd.Notify(client.id, cmd.bytes));
     }
+
+    public static void OnRoomLockReq(UnPacker unPacker, Client client)
+    {
+        if (!RoomLockReqCmd.TryParse(unPacker, out var cmd))
+        {
+            LobbyUtils.LogBadUnpacker("OnRoomLockReq");
+            return;
+        }
+
+        if (client.room == null)
+        {
+            Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
+            return;
+        }
+
+        client.room.Lock(client, cmd.password);
+
+        //client.room.SendToAll(RoomMsgNotifyCmd.Notify(client.id, cmd.bytes));
+    }
 }

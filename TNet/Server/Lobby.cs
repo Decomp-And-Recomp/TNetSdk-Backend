@@ -199,6 +199,7 @@ internal static class Lobby
             case RoomCMD.set_var: LobbyCmdImpl.OnRoomSetVar(unPacker, client); return;
             case RoomCMD.set_user_var: LobbyCmdImpl.OnRoomSetUserVar(unPacker, client); return;
             case RoomCMD.broadcast_msg: LobbyCmdImpl.OnRoomBroadcastMsg(unPacker, client); return;
+            case RoomCMD.lock_req: LobbyCmdImpl.OnRoomLockReq(unPacker, client); return;
         }
 
         LobbyUtils.LogUnimpl(command);

@@ -28,9 +28,9 @@ internal enum RoomCMD
 	send_msg = 23, // Unused?
 	broadcast_msg = 24, // Implemented
     msg_notify = 25, // Implemented
-    lock_req = 26,
-	lock_res = 27,
-	unlock_req = 28,
+    lock_req = 26, // Implemented Experemental
+    lock_res = 27, // Implemented
+    unlock_req = 28,
 	unlock_res = 29,
 	start = 30, // Implemented Experemental
     start_notify = 31, // Implemented

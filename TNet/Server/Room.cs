@@ -3,6 +3,7 @@ using TNet.Server.Cmd;
 using TNet.Server.Data;
 using TNet.Server.Notifications;
 using TNet.Server.Requests;
+using TNet.Server.Responses;
 
 namespace TNet.Server;
 
@@ -253,6 +254,24 @@ internal class Room : IDisposable, IAsyncDisposable
 
         return true;
     }
+
+    public void Lock(Client client, string pwd)
+    {
+        if (owner != client)
+        {
+            // ur not owner lil bro
+            _ = LobbyUtils.SendToClient(RoomLockResCmd.Response(false), client);
+            return;
+        }
+
+        // if breaks, use SendToAll
+        _ = LobbyUtils.SendToClient(RoomLockResCmd.Response(true, pwd), client);
+    }
+
+    /*public void Unlock(Client client, string pwd)
+    {
+
+    }*/
 
 #pragma warning disable CA2012 // Not sure if its good idea tho.
     public void Dispose() => DisposeAsync().GetAwaiter().GetResult();
