@@ -92,13 +92,13 @@ internal static class Lobby
 
         NetworkStream stream = tcpClient.GetStream();
 
-        List<byte> leftovers = [];
+        //List<byte> leftovers = [];
 
         byte[] buffer = new byte[maxDataLength];
 
         int read;
 
-        ushort length = 0;
+        //ushort length = 0;
 
         while (true)
         {
@@ -115,7 +115,9 @@ internal static class Lobby
                 break;
             }
 
-            leftovers.AddRange(buffer[..read]);
+            _ = Task.Run(() => OnReceive(buffer[..read], client));
+
+            /*leftovers.AddRange(buffer[..read]);
 
             while (leftovers.Count >= 2) // at least enough to read packet length
             {
@@ -145,7 +147,7 @@ internal static class Lobby
                 });
 
                 leftovers.RemoveRange(0, length);
-            }
+            }*/
         }
     }
 
@@ -172,7 +174,7 @@ internal static class Lobby
             return;
         }
 
-        //LobbyUtils.Log($"Protocol-{unPacker.GetProtocol()} Cmd-{unPacker.GetCmd()}", ConsoleColor.Cyan);
+        LobbyUtils.Log($"Protocol-{unPacker.GetProtocol()} Cmd-{unPacker.GetCmd()}", ConsoleColor.Cyan);
 
         if (unPacker.GetProtocol() == 1)
         {
