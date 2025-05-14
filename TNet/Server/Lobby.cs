@@ -117,6 +117,8 @@ internal static class Lobby
 
             _ = Task.Run(() => OnReceive(buffer[..read], client));
 
+            client.missedHeartbeatCounter = 0;
+
             /*leftovers.AddRange(buffer[..read]);
 
             while (leftovers.Count >= 2) // at least enough to read packet length

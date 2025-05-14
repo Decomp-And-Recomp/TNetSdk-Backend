@@ -16,8 +16,6 @@ internal static class LobbyCmdImpl
         ushort ping = 0;
         unPacker.PopUInt16(ref ping);
 
-        client.missedHeartbeatCounter = 0;
-
         await LobbyUtils.SendToClient(SysHeartbeatResCmd.Response(0), client);
     }
 

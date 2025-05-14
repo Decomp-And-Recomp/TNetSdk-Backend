@@ -31,7 +31,7 @@ internal class Client : IDisposable
         {
             missedHeartbeatCounter++;
 
-            if (missedHeartbeatCounter > 5)
+            if (missedHeartbeatCounter > 7)
             {
                 LobbyUtils.Log("Client havent sent anything in a while, removing..");
                 Disconnect();
