@@ -6,7 +6,9 @@ namespace TNet;
 
 internal class Program
 {
+#pragma warning disable IDE0060
     static async Task Main(string[] args)
+#pragma warning restore
     {
         // basic console initing
         Console.InputEncoding = Encoding.UTF8;

@@ -1,16 +1,46 @@
 ﻿using System.Net.Sockets;
+using TNet.Server.Notifications;
 
 namespace TNet.Server;
 
-internal class Client(TcpClient client) : IDisposable
+internal class Client : IDisposable
 {
-    public readonly TcpClient connection = client;
+    public readonly TcpClient connection;
     public Room? room;
 
     public bool isLogged;
 
     public string nickname = string.Empty; // i hate warnings
     public ushort id;
+
+    public Dictionary<ushort, byte[]> vars = [];
+
+    // warn every second, destroy if havent sent anything in a while
+    public int missedHeartbeatCounter = 0;
+
+    public Client(TcpClient client)
+    {
+        connection = client;
+
+        _ = Loop();
+    }
+
+    async Task Loop()
+    {
+        while (true)
+        {
+            missedHeartbeatCounter++;
+
+            if (missedHeartbeatCounter > 5)
+            {
+                LobbyUtils.Log("Client havent sent anything in a while, removing..");
+                Disconnect();
+                break;
+            }
+
+            await Task.Delay(1500);
+        }
+    }
 
     public void Disconnect()
     {
@@ -23,12 +53,21 @@ internal class Client(TcpClient client) : IDisposable
         }
         else
         {
-            LobbyUtils.Log("S", ConsoleColor.DarkRed);
+            LobbyUtils.Log("Player wasnt removed from dictionary properly.", ConsoleColor.DarkRed);
         }
 
         _ = RemoveFromRoom();
 
         Dispose();
+    }
+
+    public void SetUserVar(ushort key, byte[] var)
+    {
+        vars[key] = var;
+
+        if (room == null) return;
+
+        room.SendToAll(RoomUserVarNotifyCmd.Notify(id, key, var));
     }
 
     public async Task RemoveFromRoom()

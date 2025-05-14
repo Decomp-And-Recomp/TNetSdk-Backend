@@ -16,6 +16,8 @@ internal static class LobbyCmdImpl
         ushort ping = 0;
         unPacker.PopUInt16(ref ping);
 
+        client.missedHeartbeatCounter = 0;
+
         await LobbyUtils.SendToClient(SysHeartbeatResCmd.Response(0), client);
     }
 
@@ -131,13 +133,13 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        if (cmd.data == null || client.room == null)
+        if (cmd.data == null)
         {
             Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
             return;
         }
 
-        client.room.SetUserVariable(client.id, cmd.key, cmd.data);
+        client.SetUserVar(cmd.key, cmd.data);
     }
 
     public static void OnRoomBroadcastMsg(UnPacker unPacker, Client client)

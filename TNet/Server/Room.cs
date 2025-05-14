@@ -38,9 +38,6 @@ internal class Room : IDisposable, IAsyncDisposable
 
     readonly Dictionary<ushort, VariableSet> vars = [];
 
-    // Dictionary<Client, VariableSet>, optimise it to empty the data when player leaves
-    readonly Dictionary<ushort, VariableSet> userVars = [];
-
     Room() { }
 
     public static bool TryCreate(RoomCreateCmd cmd, out Room room, Client owner)
@@ -125,8 +122,16 @@ internal class Room : IDisposable, IAsyncDisposable
         foreach (var v in vars)
             _ = LobbyUtils.SendToClient(RoomVarNotifyCmd.Notify(v.Value.userId, v.Key, v.Value.data), client);
 
-        foreach (var v in userVars)
-            _ = LobbyUtils.SendToClient(RoomUserVarNotifyCmd.Notify(v.Value.userId, v.Key, v.Value.data), client);
+        foreach (var v in clients)
+        {
+            if (v == client) continue;
+
+            foreach (var set in v.vars)
+                _ = LobbyUtils.SendToClient(RoomUserVarNotifyCmd.Notify(v.id, set.Key, set.Value), client);
+        }
+
+        foreach (var v in client.vars) // sync user variables
+            SendToAll(RoomUserVarNotifyCmd.Notify(client.id, v.Key, v.Value), client);
 
         Debug.LogInfo("Client connected, count: " + clients.Count);
 
@@ -138,14 +143,14 @@ internal class Room : IDisposable, IAsyncDisposable
         state = State.shuttingDown;
         Debug.LogInfo("Shutting a room down");
 
-        foreach (Client client in clients) await client.RemoveFromRoom();
-
         if (Lobby.rooms.Remove(id, out var removedRoom))
         {
             // Put it back
-            if (removedRoom != this && removedRoom != null) 
+            if (removedRoom != this && removedRoom != null)
                 Lobby.rooms[id] = removedRoom;
         }
+
+        foreach (Client client in clients) await client.RemoveFromRoom();
 
         state = State.close;
     }
@@ -199,19 +204,6 @@ internal class Room : IDisposable, IAsyncDisposable
         SendToAll(RoomVarNotifyCmd.Notify(userId, key, var));
     }
 
-    public void SetUserVariable(ushort userId, ushort key, byte[] var)
-    {
-        Debug.LogInfo("Set user variable");
-
-        userVars[key] = new()
-        { 
-            userId = userId,
-            data = var
-        };
-
-        SendToAll(RoomUserVarNotifyCmd.Notify(userId, key, var));
-    }
-
     public void Start(Client startedBy)
     {
         if (state != State.open)
@@ -253,18 +245,21 @@ internal class Room : IDisposable, IAsyncDisposable
         return true;
     }
 
+    // in TLCK its used to sync coins and etc instead...
     public void Lock(Client client, string pwd)
     {
         if (owner != client)
         {
             // ur not owner lil bro
-            _ = LobbyUtils.SendToClient(RoomLockResCmd.Response(false), client);
-            return;
+            //_ = LobbyUtils.SendToClient(RoomLockResCmd.Response(false), client);
+            //return;
         }
 
-        _ = LobbyUtils.SendToClient(RoomLockResCmd.Response(true, pwd), client);
+        SendToAll(RoomLockResCmd.Response(true, pwd));
 
-        password = pwd;
+        //_ = LobbyUtils.SendToClient(RoomLockResCmd.Response(true, pwd), client);
+
+        //password = pwd;
     }
 
     /*public void Unlock(Client client, string pwd)
