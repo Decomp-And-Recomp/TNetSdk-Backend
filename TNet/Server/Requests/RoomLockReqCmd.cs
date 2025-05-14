@@ -12,7 +12,7 @@ internal class RoomLockReqCmd
     {
         result = new();
 
-        if (unPacker.PopString(ref result.password, Encoding.ASCII)) return false;
+        if (!unPacker.PopString(ref result.password, Encoding.ASCII)) return false;
 
         return true;
     }
