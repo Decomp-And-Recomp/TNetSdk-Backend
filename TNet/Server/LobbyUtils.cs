@@ -77,7 +77,7 @@ internal class LobbyUtils
         try
         {
             await client.connection.GetStream().WriteAsync(bytes);
-            Debug.LogInfo("Sent");
+            //Debug.LogInfo("Sent");
         }
         catch (Exception ex)
         {
