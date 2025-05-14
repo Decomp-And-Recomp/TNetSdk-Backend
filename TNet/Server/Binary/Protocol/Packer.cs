@@ -31,7 +31,7 @@ internal class Packer : BufferWriter
 
     public Packet MakePacket(ushort protocol, ushort cmd, bool allow_compress = true)
     {
-        Debug.Log($"Creating packet with {protocol}:{cmd}");
+        //Debug.Log($"Creating packet with {protocol}:{cmd}");
 
         byte[] array = m_data.ToArray();
         ushort sCompressType = 0;

@@ -2,7 +2,7 @@ using TNet.Server.Binary;
 
 namespace TNet.Server.Cmd;
 
-internal class RoomSendMsgCmd : RoomCmd
+internal class RoomSendMsgCmd : RoomCmd // UNUSED ON CLIENT, RoomBroadcastMsgCmd.cs used instead.
 {
 	public RoomSendMsgCmd(ushort user_id, byte[] msg_bytes)
 	{

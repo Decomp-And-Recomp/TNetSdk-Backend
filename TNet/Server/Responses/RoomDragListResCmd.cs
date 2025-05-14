@@ -15,13 +15,35 @@ internal static class RoomDragListResCmd
         packer.PushUInt16(pageSum); // page length?
         packer.PushUInt16((ushort)listType);
 
-        var list = Lobby.rooms.OrderBy(kv => kv.Key) // dont ask me, i took it from chatGPT
-            .Skip((page - 1) * pageSum)
-            .Take(pageSum)
-            .Select(kv => kv.Value)
-            .ToList();
+        List<Room> list = listType switch
+        {
+            RoomDragListType.all => Lobby.rooms
+                .OrderBy(kv => kv.Key)
+                .Skip((page - 1) * pageSum)
+                .Take(pageSum)
+                .Select(kv => kv.Value)
+                .ToList(),
 
-        packer.PushUInt16((ushort)list.Count); // sent rooms length
+            RoomDragListType.not_full => Lobby.rooms
+                .Where(kv => !kv.Value.isFull)
+                .OrderBy(kv => kv.Key)
+                .Skip((page - 1) * pageSum)
+                .Take(pageSum)
+                .Select(kv => kv.Value)
+                .ToList(),
+
+            RoomDragListType.not_full_not_game => Lobby.rooms
+                .Where(kv => !kv.Value.isFull && kv.Value.state != Room.State.started)
+                .OrderBy(kv => kv.Key)
+                .Skip((page - 1) * pageSum)
+                .Take(pageSum)
+                .Select(kv => kv.Value)
+                .ToList(),
+
+            _ => [],
+        };
+
+        packer.PushUInt16((ushort)list.Count); // send rooms length
 
         Debug.LogInfo("Room count: " + list.Count);
 

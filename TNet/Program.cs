@@ -14,6 +14,6 @@ internal class Program
 
         Console.WriteLine("TNet Backend, made by overmet15.");
 
-        await Lobby.Run(IPAddress.Parse("127.0.0.4"), 5000);
+        await Lobby.Run(IPAddress.Parse("26.171.19.25"), 5000);
     }
 }

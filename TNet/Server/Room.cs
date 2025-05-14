@@ -33,10 +33,10 @@ internal class Room : IDisposable, IAsyncDisposable
 
     public bool isFull => clients.Count >= maxUsers;
 
-    Dictionary<ushort, VariableSet> vars = [];
+    readonly Dictionary<ushort, VariableSet> vars = [];
 
     // Dictionary<Client, VariableSet>, optimise it to empty the data when player leaves
-    Dictionary<ushort, VariableSet> userVars = [];
+    readonly Dictionary<ushort, VariableSet> userVars = [];
 
     Room() { }
 
@@ -75,10 +75,16 @@ internal class Room : IDisposable, IAsyncDisposable
         return true;
     }
 
-    public async Task SendToAll(Packet packet)
+    public void SendToAll(Packet packet)
     {
         foreach (Client c in clients)
-            await LobbyUtils.SendToClient(packet, c);
+           _ = LobbyUtils.SendToClient(packet, c);
+    }
+
+    public void SendToAll(Packet packet, params Client[] excludeClients)
+    {
+        foreach (Client c in clients)
+           if (!excludeClients.Contains(c)) _ = LobbyUtils.SendToClient(packet, c);
     }
 
     public async Task ConnectClient(Client client)
@@ -91,7 +97,7 @@ internal class Room : IDisposable, IAsyncDisposable
 
         await LobbyUtils.SendToClient(joinRes, client);
 
-        await SendToAll(RoomJoinNotifyCmd.Notify(client));
+        SendToAll(RoomJoinNotifyCmd.Notify(client));
 
         // sending every player to new player manualy
         // then syncing other stuff
@@ -103,18 +109,16 @@ internal class Room : IDisposable, IAsyncDisposable
         }
 
         foreach (var v in vars)
-        {
-            await LobbyUtils.SendToClient(RoomVarNotifyCmd.Notify(v.Value.userId, v.Key, v.Value.data), client);
-        }
+            _ = LobbyUtils.SendToClient(RoomVarNotifyCmd.Notify(v.Value.userId, v.Key, v.Value.data), client);
 
         foreach (var v in userVars)
-        {
-            await LobbyUtils.SendToClient(RoomUserVarNotifyCmd.Notify(v.Value.userId, v.Key, v.Value.data), client);
-        }
+            _ = LobbyUtils.SendToClient(RoomUserVarNotifyCmd.Notify(v.Value.userId, v.Key, v.Value.data), client);
 
         Debug.LogInfo("Client connected, count: " + clients.Count);
 
-        if (clients.Count > 2 && state == State.open) await Start(owner);
+#pragma warning disable CS8604 //ToDo: remove
+        if (clients.Count > 1 && state == State.open) Start(owner);
+#pragma warning restore
     }
 
     public async Task ShutDown()
@@ -170,7 +174,7 @@ internal class Room : IDisposable, IAsyncDisposable
         await ShutDown();
     }
 
-    public async Task SetRoomVariable(ushort userId, ushort key, byte[] var)
+    public void SetRoomVariable(ushort userId, ushort key, byte[] var)
     {
         Debug.LogInfo("Set room variable");
 
@@ -180,10 +184,10 @@ internal class Room : IDisposable, IAsyncDisposable
             data = var
         };
 
-        await SendToAll(RoomVarNotifyCmd.Notify(userId, key, var));
+        SendToAll(RoomVarNotifyCmd.Notify(userId, key, var));
     }
 
-    public async Task SetUserVariable(ushort userId, ushort key, byte[] var)
+    public void SetUserVariable(ushort userId, ushort key, byte[] var)
     {
         Debug.LogInfo("Set user variable");
 
@@ -193,10 +197,10 @@ internal class Room : IDisposable, IAsyncDisposable
             data = var
         };
 
-        await SendToAll(RoomUserVarNotifyCmd.Notify(userId, key, var));
+        SendToAll(RoomUserVarNotifyCmd.Notify(userId, key, var));
     }
 
-    public async Task Start(Client startedBy)
+    public void Start(Client startedBy)
     {
         if (state != State.open)
         {
@@ -215,12 +219,12 @@ internal class Room : IDisposable, IAsyncDisposable
 
         Packet notification = RoomStartNotifyCmd.Notify(startedBy.id);
 
-        await SendToAll(notification);
+        SendToAll(notification);
     }
 
     public bool TryChangeOwner(Client newOwner)
     {
-        if (clients.Contains(newOwner))
+        if (!clients.Contains(newOwner))
         {
             Debug.LogWarning("Tried to set a new owner that is not in the room.");
             return false;

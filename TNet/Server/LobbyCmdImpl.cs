@@ -37,7 +37,7 @@ internal static class LobbyCmdImpl
     }
     #endregion
 
-    public static async Task OnRoomDragList(UnPacker unPacker, Client client)
+    public static void OnRoomDragList(UnPacker unPacker, Client client)
     {
         if (!RoomDragListCmd.TryParse(unPacker, out var roomDragList))
         {
@@ -45,10 +45,10 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        await LobbyUtils.SendToClient(RoomDragListResCmd.Response(roomDragList.page, roomDragList.pageSplit, roomDragList.listType), client);
+        _ = LobbyUtils.SendToClient(RoomDragListResCmd.Response(roomDragList.page, roomDragList.pageSplit, roomDragList.listType), client);
     }
 
-    public static async Task OnRoomCreate(UnPacker unPacker, Client client)
+    public static void OnRoomCreate(UnPacker unPacker, Client client)
     {
         if (!RoomCreateCmd.TryParse(unPacker, out var cmd))
         {
@@ -59,13 +59,11 @@ internal static class LobbyCmdImpl
         if (!Room.TryCreate(cmd, out var room, client))
         {
             LobbyUtils.Log("Couldnt create new room. (full?)", ConsoleColor.Red);
-            await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.full, 0), client);
+            _ = LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.full, 0), client);
             return;
         }
 
-        await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
-
-        //_ = room.Start(client);
+        _ =LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
     }
 
     public static void OnRoomJoin(UnPacker unPacker, Client client)
@@ -122,7 +120,7 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        _ = client.room.SetRoomVariable(client.id, cmd.key, cmd.var);
+        client.room.SetRoomVariable(client.id, cmd.key, cmd.var);
     }
 
     public static void OnRoomSetUserVar(UnPacker unPacker, Client client)
@@ -139,10 +137,10 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        _ = client.room.SetUserVariable(client.id, cmd.key, cmd.data);
+        client.room.SetUserVariable(client.id, cmd.key, cmd.data);
     }
 
-    public static async Task OnRoomBroadcastMsg(UnPacker unPacker, Client client)
+    public static void OnRoomBroadcastMsg(UnPacker unPacker, Client client)
     {
         if (!RoomBroadcastMsgCmd.TryParse(unPacker, out var cmd))
         {
@@ -156,9 +154,7 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        Packet p = RoomMsgNotifyCmd.Notify(client.id, cmd.bytes);
-
-        _ = client.room.SendToAll(p);
+        client.room.SendToAll(RoomMsgNotifyCmd.Notify(client.id, cmd.bytes));
     }
 
     [Obsolete("Use one in LobbyUtils instead.")]

@@ -92,9 +92,13 @@ internal static class Lobby
 
         NetworkStream stream = tcpClient.GetStream();
 
+        List<byte> leftovers = [];
+
         byte[] buffer = new byte[maxDataLength];
 
         int read;
+
+        ushort length = 0;
 
         while (true)
         {
@@ -111,15 +115,52 @@ internal static class Lobby
                 break;
             }
 
-            OnReceive(buffer[..read], client);
+            leftovers.AddRange(buffer[..read]);
+
+            while (leftovers.Count >= 2) // at least enough to read packet length
+            {
+                length = WatchUInt16(leftovers, 0);
+
+                if (length > maxDataLength)
+                {
+                    DisconnectClient(client, DisconnectCode.TooMuchData);
+                    return;
+                }
+
+                if (leftovers.Count < length) break; // wait for more data
+
+                byte[] arrayCopy = [.. leftovers.GetRange(0, length)];
+
+                _ = Task.Run(() =>
+                {
+                    try
+                    {
+                        OnReceive(arrayCopy, client);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogException("OnReceive threw an exception", ex);
+                        //DisconnectClient(client, DisconnectCode.ProcessingError);
+                    }
+                });
+
+                leftovers.RemoveRange(0, length);
+            }
         }
+    }
+
+    // ToDo: move somewhere else
+    public static ushort WatchUInt16(List<byte> data, int pos)
+    {
+        return (ushort)((data[pos] << 8) | data[pos + 1]);
     }
 
     static void OnReceive(byte[] bytes, Client client)
     {
         UnPacker unPacker = new();
         
-        Packet p = new(bytes, bytes.Length, true);
+        // dont copy array, we dont have infinite RAM.
+        Packet p = new(bytes, bytes.Length, bCopy: false);
 
         LobbyUtils.Decrypt(p, blowFish);
 
@@ -131,8 +172,7 @@ internal static class Lobby
             return;
         }
 
-
-        LobbyUtils.Log($"Protocol-{unPacker.GetProtocol()} Cmd-{unPacker.GetCmd()}", ConsoleColor.Cyan);
+        //LobbyUtils.Log($"Protocol-{unPacker.GetProtocol()} Cmd-{unPacker.GetCmd()}", ConsoleColor.Cyan);
 
         if (unPacker.GetProtocol() == 1)
         {
@@ -152,13 +192,13 @@ internal static class Lobby
 
         switch (command) // room commands
         {
-            case RoomCMD.drag_list: _ = LobbyCmdImpl.OnRoomDragList(unPacker, client); return;
-            case RoomCMD.create: _ = LobbyCmdImpl.OnRoomCreate(unPacker, client); return;
+            case RoomCMD.drag_list: LobbyCmdImpl.OnRoomDragList(unPacker, client); return;
+            case RoomCMD.create: LobbyCmdImpl.OnRoomCreate(unPacker, client); return;
             case RoomCMD.join: LobbyCmdImpl.OnRoomJoin(unPacker, client); return;
             case RoomCMD.leave: LobbyCmdImpl.OnRoomLeave(client); return;
             case RoomCMD.set_var: LobbyCmdImpl.OnRoomSetVar(unPacker, client); return;
             case RoomCMD.set_user_var: LobbyCmdImpl.OnRoomSetUserVar(unPacker, client); return;
-            case RoomCMD.broadcast_msg: _ = LobbyCmdImpl.OnRoomBroadcastMsg(unPacker, client); return;
+            case RoomCMD.broadcast_msg: LobbyCmdImpl.OnRoomBroadcastMsg(unPacker, client); return;
         }
 
         LobbyUtils.LogUnimpl(command);
