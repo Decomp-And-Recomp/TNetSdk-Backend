@@ -130,7 +130,7 @@ internal class Room : IDisposable, IAsyncDisposable
 
         Debug.LogInfo("Client connected, count: " + clients.Count);
 
-        //if (clients.Count > 1 && state == State.open) Start(owner);
+        if (clients.Count > 1 && state == State.open) Start(owner);
     }
 
     public async Task ShutDown()

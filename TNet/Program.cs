@@ -14,6 +14,17 @@ internal class Program
 
         Console.WriteLine("TNet Backend, made by overmet15.");
 
-        await Lobby.Run(IPAddress.Parse("26.171.19.25"), 5000);
+        Console.WriteLine("Please write the port to host on...");
+
+        int port;
+
+        while (true)
+        {
+            if (int.TryParse(Console.ReadLine(), out port)) break;
+
+            Console.WriteLine("Try again...");
+        }
+
+        await Lobby.Run(IPAddress.Any, port);
     }
 }

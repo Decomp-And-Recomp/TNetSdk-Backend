@@ -50,7 +50,7 @@ internal static class Lobby
             return;
         }
 
-        LobbyUtils.Log($"Lobby now running on: {address}:{port}", ConsoleColor.Green);
+        LobbyUtils.Log($"Lobby now running on port {port}", ConsoleColor.Green);
 
         await ServerLoop();
     }
