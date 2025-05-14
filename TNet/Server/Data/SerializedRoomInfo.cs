@@ -47,7 +47,7 @@ internal struct SerializedRoomInfo
             onlineUsers = (ushort)room.clients.Count,
             maxUsers = room.maxUsers,
             state = room.state == Room.State.started ? (ushort)1 : (ushort)0,
-            passworded = 0,
+            passworded = string.IsNullOrWhiteSpace(room.password) ? (ushort)0 : (ushort)1,
             creatorName = ownerNameArray,
             roomName = roomNameArray,
             roomComment = roomCommentArray

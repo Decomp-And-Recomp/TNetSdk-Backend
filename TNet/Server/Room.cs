@@ -23,6 +23,8 @@ internal class Room : IDisposable, IAsyncDisposable
     public string name = string.Empty;
     public string comment = string.Empty;
 
+    public string password = string.Empty;
+
     public Client? owner;
 
     public List<Client> clients = [];
@@ -64,11 +66,12 @@ internal class Room : IDisposable, IAsyncDisposable
         room.groupId = cmd.groupId;
         room.masterSwitchType = cmd.roomSwitchMasterType;
         room.roomType = cmd.roomType;
+        room.password = cmd.password;
 
         LobbyUtils.Log($"Created new room with: id={room.id}, maxUsers={room.maxUsers}, {room.masterSwitchType}, {room.roomType}", ConsoleColor.Cyan);
 
         room.owner = owner;
-        _ = room.ConnectClient(owner);
+        _ = room.TryConnectClient(owner, room.password);
 
         room.state = State.open;
 
@@ -87,8 +90,18 @@ internal class Room : IDisposable, IAsyncDisposable
            if (!excludeClients.Contains(c)) _ = LobbyUtils.SendToClient(packet, c);
     }
 
-    public async Task ConnectClient(Client client)
+    public async Task TryConnectClient(Client client, string? password)
     {
+        if (!string.IsNullOrWhiteSpace(this.password))
+        {
+            if (string.IsNullOrWhiteSpace(password) || this.password != password)
+            {
+                _ = LobbyUtils.SendToClient(RoomJoinResCmd.Response(RoomJoinResult.pwd_error), client);
+
+                return;
+            }
+        }
+
         client.room = this;
 
         clients.Add(client);

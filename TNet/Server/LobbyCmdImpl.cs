@@ -92,7 +92,7 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        _ = room.ConnectClient(client);
+        _ = room.TryConnectClient(client, cmd.password);
     }
 
     public static void OnRoomLeave(Client client)
@@ -156,8 +156,4 @@ internal static class LobbyCmdImpl
 
         client.room.SendToAll(RoomMsgNotifyCmd.Notify(client.id, cmd.bytes));
     }
-
-    [Obsolete("Use one in LobbyUtils instead.")]
-    public static async Task SendToClient(Packet packet, Client client) 
-        => await LobbyUtils.SendToClient(packet, client);
 }
