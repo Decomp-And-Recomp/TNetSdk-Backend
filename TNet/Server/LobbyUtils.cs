@@ -24,8 +24,9 @@ internal class LobbyUtils
 #pragma warning disable
     public static void LogNewConnection(Client client)
     {
-        Log("New connection from: " + ((IPEndPoint)client.connection.Client.RemoteEndPoint).Address.ToString()
-            + " id:" + client.id);
+        //Log("New connection from: " + ((IPEndPoint)client.connection.Client.RemoteEndPoint).Address.ToString()
+        //    + " id:" + client.id);
+        Log("New connection, id: " + client.id);
     }
 #pragma warning restore
     public static void Decrypt(Packet packet, BlowFish fish)
