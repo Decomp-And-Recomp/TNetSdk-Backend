@@ -14,6 +14,6 @@ internal class RoomCreaterChangeNotifyCmd
 
         packer.PushUInt16(userId);
 
-        return packer.MakePacket(Protocol.room, RoomCMD.leave_notify);
+        return packer.MakePacket(RoomCMD.creater_notify);
     }
 }
