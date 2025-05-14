@@ -264,7 +264,6 @@ internal class Room : IDisposable, IAsyncDisposable
             return;
         }
 
-        // if breaks, use SendToAll
         _ = LobbyUtils.SendToClient(RoomLockResCmd.Response(true, pwd), client);
 
         password = pwd;
