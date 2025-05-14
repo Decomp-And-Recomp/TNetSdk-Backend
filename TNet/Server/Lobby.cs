@@ -174,7 +174,7 @@ internal static class Lobby
             return;
         }
 
-        LobbyUtils.Log($"Protocol-{unPacker.GetProtocol()} Cmd-{unPacker.GetCmd()}", ConsoleColor.Cyan);
+        //LobbyUtils.Log($"Protocol-{unPacker.GetProtocol()} Cmd-{unPacker.GetCmd()}", ConsoleColor.Cyan);
 
         if (unPacker.GetProtocol() == 1)
         {
@@ -202,6 +202,7 @@ internal static class Lobby
             case RoomCMD.set_user_var: LobbyCmdImpl.OnRoomSetUserVar(unPacker, client); return;
             case RoomCMD.broadcast_msg: LobbyCmdImpl.OnRoomBroadcastMsg(unPacker, client); return;
             case RoomCMD.lock_req: LobbyCmdImpl.OnRoomLockReq(unPacker, client); return;
+            case RoomCMD.start: LobbyCmdImpl.OnRoomStart(client); return;
         }
 
         LobbyUtils.LogUnimpl(command);
@@ -218,7 +219,7 @@ internal static class Lobby
         if (code == DisconnectCode.SuspiciousRequests)
         {
             Debug.LogStackFull(ConsoleColor.DarkMagenta);
-            return;
+            return; // Off for testing..
         }
         client.Disconnect();
     }

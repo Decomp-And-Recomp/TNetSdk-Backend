@@ -175,4 +175,17 @@ internal static class LobbyCmdImpl
 
         //client.room.SendToAll(RoomMsgNotifyCmd.Notify(client.id, cmd.bytes));
     }
+
+    public static void OnRoomStart(Client client)
+    {
+        if (client.room == null)
+        {
+            Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
+            return;
+        }
+
+        client.room.Start(client);
+
+        //client.room.SendToAll(RoomMsgNotifyCmd.Notify(client.id, cmd.bytes));
+    }
 }

@@ -130,9 +130,7 @@ internal class Room : IDisposable, IAsyncDisposable
 
         Debug.LogInfo("Client connected, count: " + clients.Count);
 
-#pragma warning disable CS8604 //ToDo: remove
-        if (clients.Count > 1 && state == State.open) Start(owner);
-#pragma warning restore
+        //if (clients.Count > 1 && state == State.open) Start(owner);
     }
 
     public async Task ShutDown()
