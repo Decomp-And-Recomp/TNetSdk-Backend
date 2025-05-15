@@ -8,4 +8,5 @@ internal enum DisconnectCode
     UnknownCommand = 3,
     CouldntAddToDictionary = 4,
     SuspiciousRequests = 5,
+    RoomLeave = 6
 }
