@@ -17,6 +17,7 @@ internal class Client : IDisposable
 
     // warn every second, destroy if havent sent anything in a while
     public int missedHeartbeatCounter = 0;
+    bool disconnected;
 
     public Client(TcpClient client)
     {
@@ -27,7 +28,7 @@ internal class Client : IDisposable
 
     async Task Loop()
     {
-        while (connection.Connected)
+        while (!disconnected)
         {
             missedHeartbeatCounter++;
 
@@ -44,6 +45,8 @@ internal class Client : IDisposable
 
     public void Disconnect()
     {
+        disconnected = true;
+
         LobbyUtils.Log("Removing: " + id, ConsoleColor.DarkRed);
 
         if (Lobby.clients.TryRemove(id, out var removed))

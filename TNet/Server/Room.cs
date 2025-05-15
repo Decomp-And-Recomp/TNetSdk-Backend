@@ -116,56 +116,56 @@ internal class Room : IDisposable, IAsyncDisposable
 
     public async Task TryConnectClient(Client client, string? password)
     {
+        // Password check is disabled for now
+        /*
         if (!string.IsNullOrWhiteSpace(this.password))
         {
             if (string.IsNullOrWhiteSpace(password) || this.password != password)
             {
-                _ = LobbyUtils.SendToClient(RoomJoinResCmd.Response(RoomJoinResult.pwd_error), client);
-
+                await LobbyUtils.SendToClient(RoomJoinResCmd.Response(RoomJoinResult.pwd_error), client);
                 return;
             }
         }
+        */
 
         client.room = this;
-
         clients.Add(client);
 
         Packet joinRes = RoomJoinResCmd.Response(RoomJoinResult.ok, (ushort)clients.IndexOf(client), SerializedRoomInfo.FromRoom(this));
-
         await LobbyUtils.SendToClient(joinRes, client);
 
-        SendToAll(RoomJoinNotifyCmd.Notify(client));
+        await SendToAllAsync(RoomJoinNotifyCmd.Notify(client));
 
-        // sending every player to new player manualy
-        // then syncing other stuff
-
+        var notifyTasks = new List<Task>();
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i] == client) continue;
-
-            await LobbyUtils.SendToClient(RoomJoinNotifyCmd.Notify(clients[i]), client);
+            notifyTasks.Add(LobbyUtils.SendToClient(RoomJoinNotifyCmd.Notify(clients[i]), client));
         }
 
         foreach (var v in vars)
-            _ = LobbyUtils.SendToClient(RoomVarNotifyCmd.Notify(v.Value.userId, v.Key, v.Value.data), client);
+            notifyTasks.Add(LobbyUtils.SendToClient(RoomVarNotifyCmd.Notify(v.Value.userId, v.Key, v.Value.data), client));
 
         foreach (var v in clients)
         {
             if (v == client) continue;
-
             foreach (var set in v.vars)
-                _ = LobbyUtils.SendToClient(RoomUserVarNotifyCmd.Notify(v.id, set.Key, set.Value), client);
+                notifyTasks.Add(LobbyUtils.SendToClient(RoomUserVarNotifyCmd.Notify(v.id, set.Key, set.Value), client));
         }
 
-        foreach (var v in client.vars) // sync user variables
-            await SendToAllAsync(RoomUserVarNotifyCmd.Notify(client.id, v.Key, v.Value), client);
+        await Task.WhenAll(notifyTasks);
+
+        var syncTasks = new List<Task>();
+        foreach (var v in client.vars)
+            syncTasks.Add(SendToAllAsync(RoomUserVarNotifyCmd.Notify(client.id, v.Key, v.Value), client));
+
+        await Task.WhenAll(syncTasks);
 
         Debug.LogInfo("Client connected, count: " + clients.Count);
 
-        await Task.Delay(1000);
-
         if (clients.Count > 1 && state == State.open) Start(owner);
     }
+
 
     public async Task ShutDown()
     {
@@ -207,6 +207,7 @@ internal class Room : IDisposable, IAsyncDisposable
         clients.Remove(client);
 
         client.room = null;
+        client.Disconnect(); // yes auto disconnect
 
         if (owner != client && owner != null) return;
 

@@ -99,11 +99,11 @@ internal static class LobbyCmdImpl
 
     public static void OnRoomLeave(Client client)
     {
-        /*if (client.room == null)
+        if (client.room == null)
         {
             Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
             return;
-        }*/
+        }
 
         //Lobby.DisconnectClient(client, DisconnectCode.RoomLeave);
 
