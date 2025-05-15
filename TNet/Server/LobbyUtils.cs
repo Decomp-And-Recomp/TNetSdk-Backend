@@ -53,6 +53,26 @@ internal class LobbyUtils
     }
 #pragma warning restore
 
+    public static async Task SendToClient(Client c, params Packet[] packets)
+    {
+        List<Task> tasks = [];
+
+        foreach (Packet packet in packets) 
+            tasks.Add(SendToClient(packet, c));
+
+        await Task.WhenAll(tasks);
+    }
+
+    public static async Task SendToClients(Packet packet, params Client[] clients)
+    {
+        List<Task> tasks = [];
+
+        foreach (Client c in clients) 
+            tasks.Add(SendToClient(packet, c));
+
+        await Task.WhenAll(tasks);
+    }
+
     public static async Task SendToClient(Packet packet, Client client)
     {
         if (!client.connection.Connected)
@@ -85,6 +105,7 @@ internal class LobbyUtils
             Debug.LogException("Send failed: ", ex);
         }
     }
+
     /*
      		    uint num = (uint)((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
 				uint num2 = (uint)((data[4] << 24) | (data[5] << 16) | (data[6] << 8) | data[7]);

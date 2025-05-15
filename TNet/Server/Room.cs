@@ -82,6 +82,32 @@ internal class Room : IDisposable, IAsyncDisposable
            _ = LobbyUtils.SendToClient(packet, c);
     }
 
+    public async Task SendToAllAsync(Packet packet)
+    {
+        Task[] tasks = new Task[clients.Count];
+
+        for (int i = 0; i < clients.Count; i++)
+        {
+            tasks[i] = LobbyUtils.SendToClient(packet, clients[i]);
+        }
+
+        await Task.WhenAll(tasks);
+    }
+
+    public async Task SendToAllAsync(Packet packet, params Client[] excludeClients)
+    {
+        List<Task> tasks = [];
+
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (excludeClients.Contains(clients[i])) continue;
+
+            tasks[i] = LobbyUtils.SendToClient(packet, clients[i]);
+        }
+
+        await Task.WhenAll(tasks);
+    }
+
     public void SendToAll(Packet packet, params Client[] excludeClients)
     {
         foreach (Client c in clients)
@@ -112,7 +138,8 @@ internal class Room : IDisposable, IAsyncDisposable
 
         // sending every player to new player manualy
         // then syncing other stuff
-        for (int i = 0;  i < clients.Count; i++)
+
+        for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i] == client) continue;
 
@@ -131,9 +158,11 @@ internal class Room : IDisposable, IAsyncDisposable
         }
 
         foreach (var v in client.vars) // sync user variables
-            SendToAll(RoomUserVarNotifyCmd.Notify(client.id, v.Key, v.Value), client);
+            await SendToAllAsync(RoomUserVarNotifyCmd.Notify(client.id, v.Key, v.Value), client);
 
         Debug.LogInfo("Client connected, count: " + clients.Count);
+
+        await Task.Delay(1000);
 
         if (clients.Count > 1 && state == State.open) Start(owner);
     }
@@ -238,7 +267,7 @@ internal class Room : IDisposable, IAsyncDisposable
 
         Packet notification = RoomCreaterChangeNotifyCmd.Notify(owner.id);
 
-        foreach (Client c in clients) _ = LobbyUtils.SendToClient(notification, c);
+        SendToAll(notification);
 
         Debug.LogInfo("Changed lobby owner");
 
@@ -248,16 +277,16 @@ internal class Room : IDisposable, IAsyncDisposable
     // in TLCK its used to sync coins and etc instead...
     public void Lock(Client client, string pwd)
     {
-        if (owner != client)
+        /*if (owner != client)
         {
             // ur not owner lil bro
             //_ = LobbyUtils.SendToClient(RoomLockResCmd.Response(false), client);
             //return;
-        }
+        }*/
 
-        SendToAll(RoomLockResCmd.Response(true, pwd));
+        //SendToAll(RoomLockResCmd.Response(true, pwd));
 
-        //_ = LobbyUtils.SendToClient(RoomLockResCmd.Response(true, pwd), client);
+        _ = LobbyUtils.SendToClient(RoomLockResCmd.Response(true, pwd), client);
 
         //password = pwd;
     }

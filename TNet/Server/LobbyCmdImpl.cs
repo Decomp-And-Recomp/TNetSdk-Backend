@@ -11,10 +11,12 @@ namespace TNet.Server;
 internal static class LobbyCmdImpl
 {
     #region system
-    public static async Task OnSystemHeartbeat(UnPacker unPacker, Client client)
+    public static async Task OnSystemHeartbeat(Client client)
     {
-        ushort ping = 0;
-        unPacker.PopUInt16(ref ping);
+        //ushort ping = 0;
+        //unPacker.PopUInt16(ref ping);
+
+        Debug.Log("HEARTBEAT FROM: " + client.id);
 
         await LobbyUtils.SendToClient(SysHeartbeatResCmd.Response(0), client);
     }
@@ -145,6 +147,7 @@ internal static class LobbyCmdImpl
         if (!RoomBroadcastMsgCmd.TryParse(unPacker, out var cmd))
         {
             LobbyUtils.LogBadUnpacker("OnRoomBroadcastMsg");
+            Debug.Log(BitConverter.ToString(unPacker.ByteArray()).Replace("-", ""));
             return;
         }
 

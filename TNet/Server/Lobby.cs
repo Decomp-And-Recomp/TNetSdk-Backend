@@ -184,7 +184,7 @@ internal static class Lobby
 
             switch (sysCommand) // sys commands
             {
-                case SysCMD.heartbeat: _ = LobbyCmdImpl.OnSystemHeartbeat(unPacker, client); return; // CMD.sys_heartbeat
+                case SysCMD.heartbeat: _ = LobbyCmdImpl.OnSystemHeartbeat(client); return; // CMD.sys_heartbeat
                 case SysCMD.login: _ = LobbyCmdImpl.OnSystemPlayerLogin(unPacker, client); return;
             }
 
