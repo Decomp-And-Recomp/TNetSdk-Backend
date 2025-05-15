@@ -27,7 +27,7 @@ internal class Client : IDisposable
 
     async Task Loop()
     {
-        while (true)
+        while (connection.Connected)
         {
             missedHeartbeatCounter++;
 
