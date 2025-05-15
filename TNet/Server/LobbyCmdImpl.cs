@@ -105,9 +105,9 @@ internal static class LobbyCmdImpl
             return;
         }*/
 
-        Lobby.DisconnectClient(client, DisconnectCode.RoomLeave);
+        //Lobby.DisconnectClient(client, DisconnectCode.RoomLeave);
 
-        //_ = client.RemoveFromRoom();
+        _ = client.RemoveFromRoom();
     }
 
     public static void OnRoomSetVar(UnPacker unPacker, Client client)
