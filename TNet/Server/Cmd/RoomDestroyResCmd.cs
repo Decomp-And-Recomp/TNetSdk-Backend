@@ -1,6 +1,5 @@
 using TNet.Server.Binary;
 using TNet.Server.Binary.Protocol;
-using TNet.Server.ClientJunk;
 
 namespace TNet.Server.Cmd;
 
@@ -26,11 +25,5 @@ internal class RoomDestroyResCmd : UnPacker
 		}
 		m_result = (Result)val;
 		return true;
-	}
-
-	public override void ToTNetEventData(Packet packet, ref TNetEventData event_data)
-	{
-		ParserPacket(packet);
-		event_data.data.Add("result", m_result);
 	}
 }

@@ -32,14 +32,14 @@ internal class Client : IDisposable
         {
             missedHeartbeatCounter++;
 
-            if (missedHeartbeatCounter > 7)
+            if (missedHeartbeatCounter > 5)
             {
                 LobbyUtils.Log("Client havent sent anything in a while, removing..");
                 Disconnect();
                 break;
             }
 
-            await Task.Delay(1500);
+            await Task.Delay(2500);
         }
     }
 
@@ -59,7 +59,7 @@ internal class Client : IDisposable
             LobbyUtils.Log("Player wasnt removed from dictionary properly.", ConsoleColor.DarkRed);
         }
 
-        _ = RemoveFromRoom();
+        RemoveFromRoom();
 
         Dispose();
     }
@@ -73,16 +73,16 @@ internal class Client : IDisposable
         room.SendToAll(RoomUserVarNotifyCmd.Notify(id, key, var));
     }
 
-    public async Task RemoveFromRoom()
+    public void RemoveFromRoom()
     {
         if (room == null) return;
 
-        await room.RemoveClient(this);
+        room.RemoveClient(this);
     }
 
     public void Dispose()
     {
-        _ = RemoveFromRoom();
+        RemoveFromRoom();
 
         connection?.Close();
         connection?.Dispose();

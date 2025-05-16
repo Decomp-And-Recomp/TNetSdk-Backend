@@ -1,6 +1,5 @@
 using TNet.Server.Binary;
 using TNet.Server.Binary.Protocol;
-using TNet.Server.ClientJunk;
 
 namespace TNet.Server.Cmd;
 
@@ -21,10 +20,10 @@ internal class RoomKickUserNotifyCmd : UnPacker
 		return true;
 	}
 
-	public override void ToTNetEventData(Packet packet, ref TNetEventData event_data)
+    /*public override void ToTNetEventData(Packet packet, ref TNetEventData event_data)
 	{
 		ParserPacket(packet);
-		/*if (target == null || target.CurRoom == null)
+		if (target == null || target.CurRoom == null)
 		{
 			return;
 		}
@@ -39,6 +38,6 @@ internal class RoomKickUserNotifyCmd : UnPacker
 		{
 			target.CurRoom.RemoveUser(userById);
 			event_data.data.Add("user", userById);
-		}*/
-	}
+		}
+	}*/
 }

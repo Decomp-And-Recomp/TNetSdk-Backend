@@ -15,6 +15,6 @@ internal static class SysHeartbeatResCmd
         Packer result = new();
         result.PushUInt64(serverTime);
 
-        return result.MakePacket(Protocol.sys, SysCMD.heartbeat_res);
+        return result.MakePacket(SysCMD.heartbeat_res);
     }
 }

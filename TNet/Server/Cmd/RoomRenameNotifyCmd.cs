@@ -1,7 +1,6 @@
 using System.Text;
 using TNet.Server.Binary;
 using TNet.Server.Binary.Protocol;
-using TNet.Server.ClientJunk;
 
 namespace TNet.Server.Cmd;
 
@@ -9,7 +8,7 @@ internal class RoomRenameNotifyCmd : UnPacker
 {
 	public ushort m_user_id;
 
-	public string m_room_name;
+	public string m_room_name = string.Empty;
 
 	public override bool ParserPacket(Packet packet)
 	{
@@ -35,14 +34,14 @@ internal class RoomRenameNotifyCmd : UnPacker
 		return true;
 	}
 
-	public override void ToTNetEventData(Packet packet, ref TNetEventData event_data)
+    /*public override void ToTNetEventData(Packet packet, ref TNetEventData event_data)
 	{
 		ParserPacket(packet);
-		/*if (target != null && target.CurRoom != null)
+        if (target != null && target.CurRoom != null)
 		{
 			target.CurRoom.Name = m_room_name;
 		}
 		event_data.data.Add("userId", m_user_id);
-		event_data.data.Add("roomName", m_room_name);*/
-	}
+		event_data.data.Add("roomName", m_room_name);
+	}*/
 }

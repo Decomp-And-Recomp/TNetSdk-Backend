@@ -1,7 +1,6 @@
 using System.Text;
 using TNet.Server.Binary;
 using TNet.Server.Binary.Protocol;
-using TNet.Server.ClientJunk;
 
 namespace TNet.Server.Cmd;
 
@@ -15,7 +14,7 @@ internal class RoomUnlockResCmd : UnPacker
 
 	public Result m_result;
 
-	public string m_key;
+	public string m_key = string.Empty;
 
 	public override bool ParserPacket(Packet packet)
 	{
@@ -41,12 +40,5 @@ internal class RoomUnlockResCmd : UnPacker
 		m_key = Encoding.ASCII.GetString(ByteArray(), base.Offset, val2);
 		base.Offset += val2;
 		return true;
-	}
-
-	public override void ToTNetEventData(Packet packet, ref TNetEventData event_data)
-	{
-		ParserPacket(packet);
-		event_data.data.Add("result", m_result);
-		event_data.data.Add("key", m_key);
 	}
 }

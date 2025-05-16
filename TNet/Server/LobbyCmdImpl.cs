@@ -14,9 +14,10 @@ internal static class LobbyCmdImpl
     public static async Task OnSystemHeartbeat(Client client)
     {
         //ushort ping = 0;
-        //unPacker.PopUInt16(ref ping);
+        //unPacker.PopUInt16(ref ping); // player is sending the ping, but lets ignore it
 
         Debug.Log("HEARTBEAT FROM: " + client.id);
+        client.missedHeartbeatCounter = 0;
 
         await LobbyUtils.SendToClient(SysHeartbeatResCmd.Response(0), client);
     }
@@ -58,14 +59,11 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        if (!Room.TryCreate(cmd, out var room, client))
+        if (!Room.TryCreate(cmd, out _, client))
         {
             LobbyUtils.Log("Couldnt create new room. (full?)", ConsoleColor.Red);
             _ = LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.full, 0), client);
-            return;
         }
-
-        _ =LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, room.id), client);
     }
 
     public static void OnRoomJoin(UnPacker unPacker, Client client)
@@ -105,9 +103,7 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        //Lobby.DisconnectClient(client, DisconnectCode.RoomLeave);
-
-        _ = client.RemoveFromRoom();
+        client.RemoveFromRoom();
     }
 
     public static void OnRoomSetVar(UnPacker unPacker, Client client)

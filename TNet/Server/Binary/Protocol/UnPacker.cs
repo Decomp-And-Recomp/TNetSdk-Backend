@@ -58,8 +58,4 @@ internal class UnPacker : BufferReader
     {
         return header.m_sCmd;
     }
-
-    public virtual void ToTNetEventData(Packet packet, ref TNetEventData data) //, TNetObject target
-    {
-    }
 }

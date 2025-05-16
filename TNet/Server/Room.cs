@@ -7,7 +7,7 @@ using TNet.Server.Responses;
 
 namespace TNet.Server;
 
-internal class Room : IDisposable, IAsyncDisposable
+internal class Room : IDisposable
 {
     struct VariableSet
     {
@@ -65,15 +65,26 @@ internal class Room : IDisposable, IAsyncDisposable
         room.masterSwitchType = cmd.roomSwitchMasterType;
         room.roomType = cmd.roomType;
         room.password = cmd.password;
+        room.owner = owner;
+        room.state = State.open;
+
+        _ = room.CreationLogic();
 
         LobbyUtils.Log($"Created new room with: id={room.id}, maxUsers={room.maxUsers}, {room.masterSwitchType}, {room.roomType}", ConsoleColor.Cyan);
 
-        room.owner = owner;
-        _ = room.TryConnectClient(owner, room.password);
-
-        room.state = State.open;
-
         return true;
+    }
+
+    async Task CreationLogic()
+    {
+        if (owner == null)
+        {
+            Debug.LogError($"Lobby owner is null, shutting down.");
+            ShutDown();
+            return;
+        }
+        await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, id), owner);
+        _ = TryConnectClient(owner, password);
     }
 
     public void SendToAll(Packet packet)
@@ -113,9 +124,10 @@ internal class Room : IDisposable, IAsyncDisposable
         foreach (Client c in clients)
            if (!excludeClients.Contains(c)) _ = LobbyUtils.SendToClient(packet, c);
     }
-
+#pragma warning disable IDE0060
     public async Task TryConnectClient(Client client, string? password)
     {
+#pragma warning restore
         // Password check is disabled for now
         /*
         if (!string.IsNullOrWhiteSpace(this.password))
@@ -163,11 +175,13 @@ internal class Room : IDisposable, IAsyncDisposable
 
         Debug.LogInfo("Client connected, count: " + clients.Count);
 
+#pragma warning disable CS8604 // ToDo: THIS WILL BE REMOVED AFTER TESTING
         if (clients.Count > 1 && state == State.open) Start(owner);
+#pragma warning restore
     }
 
 
-    public async Task ShutDown()
+    public void ShutDown()
     {
         state = State.shuttingDown;
         Debug.LogInfo("Shutting a room down");
@@ -179,12 +193,12 @@ internal class Room : IDisposable, IAsyncDisposable
                 Lobby.rooms[id] = removedRoom;
         }
 
-        foreach (Client client in clients) await client.RemoveFromRoom();
+        foreach (Client client in clients) client.RemoveFromRoom();
 
         state = State.close;
     }
 
-    public async Task RemoveClient(Client client)
+    public void RemoveClient(Client client)
     {
         if (state == State.shuttingDown) return;
 
@@ -200,14 +214,14 @@ internal class Room : IDisposable, IAsyncDisposable
         }
 
         // Yes you need to notify the removed player too
-        Packet p = RoomLeaveNotifyCmd.Notify(client.id);
-
-        foreach (Client c in clients) await LobbyUtils.SendToClient(p, c);
+        SendToAll(RoomLeaveNotifyCmd.Notify(client.id));
 
         clients.Remove(client);
 
         client.room = null;
-        client.Disconnect(); // yes auto disconnect
+
+        if (state == State.started)
+            Lobby.DisconnectClient(client, DisconnectCode.RoomLeave); // yes auto disconnect
 
         if (owner != client && owner != null) return;
 
@@ -218,7 +232,7 @@ internal class Room : IDisposable, IAsyncDisposable
 
         Debug.LogInfo("No room owner.");
 
-        await ShutDown();
+        ShutDown();
     }
 
     public void SetRoomVariable(ushort userId, ushort key, byte[] var)
@@ -238,7 +252,7 @@ internal class Room : IDisposable, IAsyncDisposable
     {
         if (state != State.open)
         {
-            Debug.LogWarning("Room has to be open, but the sate is: " + state);
+            Debug.LogWarning("Room has to be open, but the state is: " + state);
             return;
         }
 
@@ -251,9 +265,7 @@ internal class Room : IDisposable, IAsyncDisposable
 
         state = State.started;
 
-        Packet notification = RoomStartNotifyCmd.Notify(startedBy.id);
-
-        SendToAll(notification);
+        SendToAll(RoomStartNotifyCmd.Notify(startedBy.id));
     }
 
     public bool TryChangeOwner(Client newOwner)
@@ -266,15 +278,14 @@ internal class Room : IDisposable, IAsyncDisposable
 
         owner = newOwner;
 
-        Packet notification = RoomCreaterChangeNotifyCmd.Notify(owner.id);
-
-        SendToAll(notification);
+        SendToAll(RoomCreaterChangeNotifyCmd.Notify(owner.id));
 
         Debug.LogInfo("Changed lobby owner");
 
         return true;
     }
 
+#pragma warning disable CA1822
     // in TLCK its used to sync coins and etc instead...
     public void Lock(Client client, string pwd)
     {
@@ -291,20 +302,12 @@ internal class Room : IDisposable, IAsyncDisposable
 
         //password = pwd;
     }
+#pragma warning restore
 
     /*public void Unlock(Client client, string pwd)
     {
 
     }*/
 
-#pragma warning disable CA2012 // Not sure if its good idea tho.
-    public void Dispose() => DisposeAsync().GetAwaiter().GetResult();
-#pragma warning restore
-
-    public async ValueTask DisposeAsync()
-    {
-        await ShutDown();
-
-        GC.SuppressFinalize(this);
-    }
+    public void Dispose() => ShutDown();
 }

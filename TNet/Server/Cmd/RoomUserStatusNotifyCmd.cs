@@ -1,6 +1,5 @@
 using TNet.Server.Binary;
 using TNet.Server.Binary.Protocol;
-using TNet.Server.ClientJunk;
 
 namespace TNet.Server.Cmd;
 
@@ -39,13 +38,5 @@ internal class RoomUserStatusNotifyCmd : UnPacker
 		//ByteArray ba = new ByteArray(val2);
 		//sfs_object = SFSObject.NewFromBinaryData(ba);
 		return true;
-	}
-
-	public override void ToTNetEventData(Packet packet, ref TNetEventData event_data)
-	{
-		ParserPacket(packet);
-		event_data.data.Add("userId", m_user_id);
-		//event_data.data.Add("key", (TNetUserStatusType)m_key);
-		//event_data.data.Add("value", sfs_object);
 	}
 }

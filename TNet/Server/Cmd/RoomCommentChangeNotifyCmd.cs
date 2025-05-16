@@ -9,7 +9,7 @@ internal class RoomCommentChangeNotifyCmd : UnPacker
 {
 	public ushort m_user_id;
 
-	public string m_comment;
+	public string m_comment = string.Empty;
 
 	public override bool ParserPacket(Packet packet)
 	{
@@ -33,16 +33,5 @@ internal class RoomCommentChangeNotifyCmd : UnPacker
 		m_comment = Encoding.ASCII.GetString(ByteArray(), base.Offset, val);
 		base.Offset += val;
 		return true;
-	}
-
-	public override void ToTNetEventData(Packet packet, ref TNetEventData event_data)
-	{
-		ParserPacket(packet);
-		/*if (target != null && target.CurRoom != null)
-		{
-			target.CurRoom.Commnet = m_comment;
-		}*/
-		event_data.data.Add("userId", m_user_id);
-		event_data.data.Add("comment", m_comment);
 	}
 }

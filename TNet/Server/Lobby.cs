@@ -92,13 +92,9 @@ internal static class Lobby
 
         NetworkStream stream = tcpClient.GetStream();
 
-        //List<byte> leftovers = [];
-
         byte[] buffer = new byte[maxDataLength];
 
         int read;
-
-        //ushort length = 0;
 
         while (true)
         {
@@ -115,41 +111,7 @@ internal static class Lobby
                 break;
             }
 
-            _ = Task.Run(() => OnReceive(buffer[..read], client));
-
-            client.missedHeartbeatCounter = 0;
-
-            /*leftovers.AddRange(buffer[..read]);
-
-            while (leftovers.Count >= 2) // at least enough to read packet length
-            {
-                length = WatchUInt16(leftovers, 0);
-
-                if (length > maxDataLength)
-                {
-                    DisconnectClient(client, DisconnectCode.TooMuchData);
-                    return;
-                }
-
-                if (leftovers.Count < length) break; // wait for more data
-
-                byte[] arrayCopy = [.. leftovers.GetRange(0, length)];
-
-                _ = Task.Run(() =>
-                {
-                    try
-                    {
-                        OnReceive(arrayCopy, client);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogException("OnReceive threw an exception", ex);
-                        //DisconnectClient(client, DisconnectCode.ProcessingError);
-                    }
-                });
-
-                leftovers.RemoveRange(0, length);
-            }*/
+            _ = Task.Run(() => OnReceive(buffer, client));
         }
     }
 
@@ -163,8 +125,7 @@ internal static class Lobby
     {
         UnPacker unPacker = new();
         
-        // dont copy array, we dont have infinite RAM.
-        Packet p = new(bytes, bytes.Length, bCopy: false);
+        Packet p = new(bytes, bytes.Length, true);
 
         LobbyUtils.Decrypt(p, blowFish);
 
@@ -209,6 +170,28 @@ internal static class Lobby
 
         LobbyUtils.LogUnimpl(command);
     }
+
+    /*internal enum TNetEventRoom
+    {
+        GET_ROOM_LIST = 2,
+        ROOM_REMOVE = 7,
+        ROOM_CREATION = 4,
+        ROOM_JOIN = 9,
+        USER_ENTER_ROOM = 10,
+        USER_EXIT_ROOM = 12,
+        USER_BE_KICKED = 14,
+        OBJECT_MESSAGE = 25,
+        ROOM_VARIABLES_UPDATE = 18,
+        USER_VARIABLES_UPDATE = 20,
+        USER_STATE = 22,
+        ROOM_NAME_CHANGE = 16,
+        LOCK_STH = 27,
+        UNLOCK_STH = 29,
+        ROOM_START = 31,
+        ROOM_MASTER_CHANGE = 32,
+        ROOM_REMOVE_RES = 6,
+        ROOM_COMMENT_CHANGE = 34
+    }*/
 
     public static void DisconnectClient(Client client)
     {
