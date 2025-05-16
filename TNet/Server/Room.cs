@@ -118,6 +118,8 @@ internal class Room : IDisposable
         await Task.WhenAll(tasks);
     }
 
+    bool startingTemporary = false;
+
     public void SendToAll(Packet packet, params Client[] excludeClients)
     {
         foreach (Client c in clients)
@@ -175,7 +177,16 @@ internal class Room : IDisposable
         Debug.LogInfo("Client connected, count: " + clients.Count);
 
 #pragma warning disable CS8604 // ToDo: THIS WILL BE REMOVED AFTER TESTING
-        if (clients.Count > 1 && state == State.open) Start(owner);
+        if (!startingTemporary && clients.Count > 2 && state == State.open)
+        {
+            startingTemporary = true;
+
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(10000);
+                Start(owner);
+            });
+        }
 #pragma warning restore
     }
 

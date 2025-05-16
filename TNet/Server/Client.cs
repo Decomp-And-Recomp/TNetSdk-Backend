@@ -23,7 +23,7 @@ internal class Client : IDisposable
     {
         connection = client;
 
-        _ = Loop();
+        //_ = Loop();
     }
 
     async Task Loop()
