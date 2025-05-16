@@ -17,7 +17,7 @@ internal class Room : IDisposable
 
     public enum State { open, started, shuttingDown, close }
 
-    public State state { get; private set; }
+    public State state { get; private set; } = State.open;
 
     public ushort id, maxUsers, groupId;
 
@@ -66,7 +66,6 @@ internal class Room : IDisposable
         room.roomType = cmd.roomType;
         room.password = cmd.password;
         room.owner = owner;
-        room.state = State.open;
 
         _ = room.CreationLogic();
 
