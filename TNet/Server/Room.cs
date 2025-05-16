@@ -177,7 +177,7 @@ internal class Room : IDisposable
         Debug.LogInfo("Client connected, count: " + clients.Count);
 
 #pragma warning disable CS8604 // ToDo: THIS WILL BE REMOVED AFTER TESTING
-        if (!startingTemporary && clients.Count > 2 && state == State.open)
+        if (!startingTemporary && clients.Count > 1 && state == State.open)
         {
             startingTemporary = true;
 
