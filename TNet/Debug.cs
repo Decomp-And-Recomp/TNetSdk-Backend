@@ -20,7 +20,8 @@
                 }
 
                 Console.ForegroundColor = color;
-                Console.WriteLine(msg);
+                var v = DateTime.UtcNow;
+                Console.WriteLine(v.ToString("[HH:mm:ss:fff] ") + msg);
                 Console.ForegroundColor = ConsoleColor.White;
             }
         }

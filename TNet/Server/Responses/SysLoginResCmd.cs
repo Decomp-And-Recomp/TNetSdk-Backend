@@ -18,6 +18,6 @@ internal static class SysLoginResCmd
         resultPacket.PushUInt16(userId);
         resultPacket.PushString(nickname, System.Text.Encoding.ASCII);
 
-        return resultPacket.MakePacket(Protocol.sys, SysCMD.login_res);
+        return resultPacket.MakePacket(SysCMD.login_res);
     }
 }
