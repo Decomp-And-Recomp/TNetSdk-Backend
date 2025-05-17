@@ -99,6 +99,8 @@ internal static class Lobby
 
         NetworkStream stream = tcpClient.GetStream();
 
+        List<byte> recivied = [];
+
         byte[] buffer = new byte[maxDataLength];
 
         int read;
@@ -118,7 +120,39 @@ internal static class Lobby
                 break;
             }
 
-            _ = Task.Run(() => OnReceive(buffer, read, client));
+            recivied.AddRange(buffer[..read]);
+
+            // actual package checking
+            while (true)
+            {
+                if (recivied.Count < Header.HEADER_LENGTH) break;
+
+                ushort length = WatchUInt16(recivied, 0);
+
+                if (length > maxDataLength)
+                {
+                    DisconnectClient(client, DisconnectCode.TooMuchData);
+                    break;
+                }
+                if (length < Header.HEADER_LENGTH)
+                {
+                    DisconnectClient(client, DisconnectCode.TooShortData);
+                    break;
+                }
+
+
+                if (recivied.Count >= length)
+                {
+                    byte[] bytes = new byte[recivied.Count];
+
+                    recivied.CopyTo(0, bytes, 0, length);
+
+                    recivied.RemoveRange(0, length);
+
+                    _ = Task.Run(() => OnReceive(bytes, length, client));
+                }
+                else break;
+            }
         }
     }
 

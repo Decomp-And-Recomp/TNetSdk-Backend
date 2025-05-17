@@ -9,5 +9,6 @@ internal enum DisconnectCode
     CouldntAddToDictionary,
     SuspiciousRequests,
     RoomLeave,
-    SocketDisconnect
+    SocketDisconnect,
+    TooShortData
 }
