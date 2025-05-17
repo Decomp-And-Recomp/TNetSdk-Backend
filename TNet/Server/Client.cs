@@ -32,7 +32,7 @@ internal class Client : IDisposable
         {
             missedHeartbeatCounter++;
 
-            if (missedHeartbeatCounter > 5)
+            if (missedHeartbeatCounter > 7)
             {
                 LobbyUtils.Log("Client havent sent anything in a while, removing..");
                 Disconnect();
@@ -48,6 +48,7 @@ internal class Client : IDisposable
         disconnected = true;
 
         LobbyUtils.Log("Removing: " + id, ConsoleColor.DarkRed);
+        Debug.LogStackSingle(2);
 
         if (Lobby.clients.TryRemove(id, out var removed))
         {
@@ -61,7 +62,8 @@ internal class Client : IDisposable
 
         RemoveFromRoom();
 
-        Dispose();
+        connection?.Close();
+        connection?.Dispose();
     }
 
     public void SetUserVar(ushort key, byte[] var)
@@ -80,11 +82,5 @@ internal class Client : IDisposable
         room.RemoveClient(this);
     }
 
-    public void Dispose()
-    {
-        RemoveFromRoom();
-
-        connection?.Close();
-        connection?.Dispose();
-    }
+    public void Dispose() => Disconnect();
 }
