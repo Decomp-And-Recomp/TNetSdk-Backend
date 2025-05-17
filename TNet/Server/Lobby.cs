@@ -61,7 +61,14 @@ internal static class Lobby
 
         while (true)
         {
-            _ = HandleConnection(await listener.AcceptTcpClientAsync());
+            try
+            {
+                _ = HandleConnection(await listener.AcceptTcpClientAsync());
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException("SERVER LOOP ALMOST BROKE", ex);
+            }
         }
     }
 

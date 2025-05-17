@@ -9,6 +9,7 @@ internal static class AdminCommands
         AdminPanel.RegisterCommand("client-list", ClientList, "lists all clients.");
         AdminPanel.RegisterCommand("client-disconnect", ClientDisconnect, "put id(s) after command.");
     }
+
     static void ClientList(string[] arguments)
     {
         foreach (Client c in Lobby.clients.Values)
