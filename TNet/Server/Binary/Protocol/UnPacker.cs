@@ -1,5 +1,4 @@
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using TNet.Server.ClientJunk;
 
 namespace TNet.Server.Binary.Protocol;
 

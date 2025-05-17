@@ -1,6 +1,5 @@
 using TNet.Server.Binary;
 using TNet.Server.Binary.Protocol;
-using TNet.Server.ClientJunk;
 
 namespace TNet.Server.Responses;
 
