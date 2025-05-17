@@ -210,7 +210,7 @@ internal static class Lobby
         LobbyUtils.Log("Disconnected player: " + code);
         if (code == DisconnectCode.SuspiciousRequests)
         {
-            Debug.LogStackFull(ConsoleColor.DarkMagenta);
+            Debug.LogStack(ConsoleColor.DarkMagenta);
             return; // Off for testing..
         }
         client.Disconnect();

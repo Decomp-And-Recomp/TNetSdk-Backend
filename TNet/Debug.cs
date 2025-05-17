@@ -66,14 +66,14 @@ public static class Debug
     public static void LogWarning(object msg)
     {
         Log(msg, ConsoleColor.Yellow);
-        LogStackFull(ConsoleColor.DarkYellow);
+        LogStack(ConsoleColor.DarkYellow);
     }
 
     ///<summary>Logs message and stack trace</summary>
     public static void LogError(object msg)
     {
         Log(msg, ConsoleColor.Red);
-        LogStackFull(ConsoleColor.DarkRed);
+        LogStack(ConsoleColor.DarkRed);
     }
 
     ///<summary>Logs [message] (from exception) and [stack trace]</summary>
@@ -92,20 +92,7 @@ public static class Debug
     }
 
 #pragma warning disable
-    public static void LogStackSingle(int frame = 1, ConsoleColor color = ConsoleColor.White)
-    {
-        System.Diagnostics.StackTrace stackTrace = new(true);
-
-        System.Diagnostics.StackFrame callerFrame = stackTrace.GetFrame(frame);
-
-        string methodName = callerFrame.GetMethod().Name;
-        string className = callerFrame.GetMethod().DeclaringType.FullName;
-        int line = callerFrame.GetFileLineNumber();
-
-        Log($"{className}.{methodName}:{line}", color);
-    }
-
-    public static void LogStackFull(ConsoleColor color = ConsoleColor.White)
+    public static void LogStack(ConsoleColor color = ConsoleColor.White)
     {
         System.Diagnostics.StackTrace stackTrace = new(true);
 

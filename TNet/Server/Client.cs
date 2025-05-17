@@ -48,7 +48,7 @@ internal class Client : IDisposable
         disconnected = true;
 
         LobbyUtils.Log("Removing: " + id, ConsoleColor.DarkRed);
-        Debug.LogStackSingle(2);
+        Debug.LogStack();
 
         if (Lobby.clients.TryRemove(id, out var removed))
         {
