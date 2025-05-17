@@ -1,6 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using TNet.Encryption;
@@ -102,8 +100,9 @@ internal static class Lobby
         List<byte> recivied = [];
 
         byte[] buffer = new byte[maxDataLength];
-
         int read;
+
+        ushort length = 5;
 
         while (true)
         {
@@ -120,38 +119,46 @@ internal static class Lobby
                 break;
             }
 
-            recivied.AddRange(buffer[..read]);
+            _ = Task.Run(() => OnReceive(buffer, read, client));
 
-            // actual package checking
+            continue;
+
+            recivied.AddRange(buffer.Take(read));
+
+            // multi package checking
             while (true)
             {
                 if (recivied.Count < Header.HEADER_LENGTH) break;
 
-                ushort length = WatchUInt16(recivied, 0);
+                // FIXME ToDo: DONT CREATE THE FUCKING PACKET BRO WE DONT HAVE INFINITE RAM
+                Packet p = new(recivied.ToArray(), recivied.Count, true);
+
+                LobbyUtils.Decrypt(p, blowFish);
+
+                p.PopUInt16(ref length);
 
                 if (length > maxDataLength)
                 {
+                    Debug.Log("Data amount: " + length);
                     DisconnectClient(client, DisconnectCode.TooMuchData);
                     break;
                 }
                 if (length < Header.HEADER_LENGTH)
                 {
+                    Debug.Log("Data amount: " + length);
                     DisconnectClient(client, DisconnectCode.TooShortData);
                     break;
                 }
 
+                if (recivied.Count < length) break;
 
-                if (recivied.Count >= length)
-                {
-                    byte[] bytes = new byte[recivied.Count];
+                byte[] bytes = new byte[length];
 
-                    recivied.CopyTo(0, bytes, 0, length);
+                recivied.CopyTo(0, bytes, 0, length);
 
-                    recivied.RemoveRange(0, length);
+                recivied.RemoveRange(0, length);
 
-                    _ = Task.Run(() => OnReceive(bytes, length, client));
-                }
-                else break;
+                _ = Task.Run(() => OnReceive(bytes, length, client));
             }
         }
     }
@@ -166,7 +173,7 @@ internal static class Lobby
     {
         UnPacker unPacker = new();
         
-        Packet p = new(bytes, length, true);
+        Packet p = new(bytes, length, false);
 
         LobbyUtils.Decrypt(p, blowFish);
 
@@ -175,6 +182,8 @@ internal static class Lobby
             Debug.LogWarning("UnPacker couldnt unpack the packet");
             return;
         }
+
+        Debug.Log("Data amount: " + unPacker.GetLength());
 
         if (unPacker.GetLength() != length) 
             Debug.Log($"unPacker and bytes length doesnt match: {unPacker.GetLength()} - {length}");
