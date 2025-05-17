@@ -1,5 +1,7 @@
 namespace TNet.Encryption;
 
+#pragma warning disable
+
 internal class BlowFish
 {
 	private readonly uint[,] S = new uint[4, 256];

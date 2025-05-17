@@ -27,6 +27,7 @@ internal class Program
             Console.WriteLine("Try again...");
         }
 
+        _ = Task.Run(AdminPanel.Run);
         await Lobby.Run(IPAddress.Any, port);
     }
 }
