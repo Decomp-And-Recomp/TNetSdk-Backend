@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace TNet.Admin;
+namespace TNet;
 
 internal static class AdminPanel
 {

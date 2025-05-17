@@ -29,8 +29,8 @@ internal static class Lobby
     {
         switch (state)
         {
-            case LobbyState.Initing: Debug.LogError("Tried running server while Initing one."); return;
-            case LobbyState.Running: Debug.LogError("Tried running server while one is already Running."); return;
+            case LobbyState.Initing: Debug.LogError("Tried running server while Initing."); return;
+            case LobbyState.Running: Debug.LogError("Tried running server while is already Running."); return;
         }
 
         state = LobbyState.Initing;
