@@ -38,6 +38,8 @@ internal class Room : IDisposable
 
     readonly Dictionary<ushort, VariableSet> vars = [];
 
+    bool isStarting = false;
+
     Room() { }
 
     public static bool TryCreate(RoomCreateCmd cmd, out Room room, Client owner)
@@ -118,8 +120,6 @@ internal class Room : IDisposable
         await Task.WhenAll(tasks);
     }
 
-    bool startingTemporary = false;
-
     public void SendToAll(Packet packet, params Client[] excludeClients)
     {
         foreach (Client c in clients)
@@ -177,14 +177,14 @@ internal class Room : IDisposable
         Debug.LogInfo("Client connected, count: " + clients.Count);
 
 #pragma warning disable CS8604 // ToDo: THIS WILL BE REMOVED AFTER TESTING
-        if (!startingTemporary && clients.Count > 1 && state == State.open)
+        if (!isStarting && clients.Count > 1 && state == State.open)
         {
-            startingTemporary = true;
+            isStarting = true;
 
             _ = Task.Run(async () =>
             {
                 await Task.Delay(10000);
-                Start(owner);
+                if (state == State.open) Start(owner);
             });
         }
 #pragma warning restore
