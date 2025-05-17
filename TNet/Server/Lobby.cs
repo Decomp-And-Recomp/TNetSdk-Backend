@@ -111,7 +111,7 @@ internal static class Lobby
                 break;
             }
 
-            _ = Task.Run(() => OnReceive(buffer, client));
+            _ = Task.Run(() => OnReceive(buffer, read, client));
         }
     }
 
@@ -121,11 +121,11 @@ internal static class Lobby
         return (ushort)((data[pos] << 8) | data[pos + 1]);
     }
 
-    static void OnReceive(byte[] bytes, Client client)
+    static void OnReceive(byte[] bytes, int length, Client client)
     {
         UnPacker unPacker = new();
         
-        Packet p = new(bytes, bytes.Length, true);
+        Packet p = new(bytes, length, true);
 
         LobbyUtils.Decrypt(p, blowFish);
 
@@ -135,8 +135,8 @@ internal static class Lobby
             return;
         }
 
-        if (unPacker.GetLength() != bytes.Length) 
-            Debug.Log($"Packet and bytes length doesnt match: {unPacker.GetLength()} - {bytes.Length}");
+        if (unPacker.GetLength() != length) 
+            Debug.Log($"unPacker and bytes length doesnt match: {unPacker.GetLength()} - {length}");
 
         if (unPacker.GetProtocol() > 2 || unPacker.GetProtocol() < 1)
         {
