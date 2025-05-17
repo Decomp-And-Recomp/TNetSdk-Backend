@@ -15,6 +15,7 @@ internal static class AdminPanel
     static AdminPanel()
     {
         RegisterCommand("?", (args) => Debug.Log(helpBuilder), "Log this.");
+        AdminCommands.SetUp();
     }
 
     public static void Run()
