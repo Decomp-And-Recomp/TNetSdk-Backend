@@ -208,7 +208,7 @@ internal class Room : IDisposable
         state = State.close;
     }
 
-    public void RemoveClient(Client client)
+    public void RemoveClient(Client client, bool disconnectClient = false)
     {
         if (state == State.shuttingDown) return;
 
@@ -230,7 +230,7 @@ internal class Room : IDisposable
 
         client.room = null;
 
-        if (state == State.started)
+        if (state == State.started) 
             Lobby.DisconnectClient(client, DisconnectCode.RoomLeave); // yes auto disconnect
 
         if (owner != client && owner != null) return;

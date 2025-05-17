@@ -17,13 +17,13 @@ internal class Client : IDisposable
 
     // warn every second, destroy if havent sent anything in a while
     public int missedHeartbeatCounter = 0;
-    bool disconnected;
+    public bool disconnected { get; private set; }
 
     public Client(TcpClient client)
     {
         connection = client;
 
-        //_ = Loop();
+        _ = Loop();
     }
 
     async Task Loop()
@@ -32,19 +32,21 @@ internal class Client : IDisposable
         {
             missedHeartbeatCounter++;
 
-            if (missedHeartbeatCounter > 7)
+            if (missedHeartbeatCounter > 8)
             {
                 LobbyUtils.Log("Client havent sent anything in a while, removing..");
                 Disconnect();
                 break;
             }
 
-            await Task.Delay(2500);
+            await Task.Delay(2000);
         }
     }
 
     public void Disconnect()
     {
+        if (disconnected) return;
+
         disconnected = true;
 
         LobbyUtils.Log("Removing: " + id, ConsoleColor.DarkRed);

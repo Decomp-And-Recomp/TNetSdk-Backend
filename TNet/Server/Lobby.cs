@@ -102,7 +102,7 @@ internal static class Lobby
 
             if (read == 0)
             {
-                DisconnectClient(client);
+                DisconnectClient(client, DisconnectCode.SocketDisconnect);
                 break;
             }
             else if (read > maxDataLength)
@@ -200,13 +200,10 @@ internal static class Lobby
         ROOM_COMMENT_CHANGE = 34
     }*/
 
-    public static void DisconnectClient(Client client)
-    {
-        DisconnectClient(client, DisconnectCode.NoCode);
-    }
-
     public static void DisconnectClient(Client client, DisconnectCode code)
     {
+        if (client.disconnected) return;
+
         LobbyUtils.Log("Disconnected player: " + code);
         if (code == DisconnectCode.SuspiciousRequests)
         {

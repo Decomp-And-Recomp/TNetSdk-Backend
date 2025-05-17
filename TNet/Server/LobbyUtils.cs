@@ -93,13 +93,11 @@ internal class LobbyUtils
 
     public static async Task SendToClient(Packet packet, Client client)
     {
-        if (!client.connection.Connected)
+        if (client.disconnected)
         {
-            Debug.LogError("Client disconnected");
+            //Debug.LogError("Client disconnected");
             return;
         }
-
-        client.connection.SendTimeout = 3000;
 
         Encrypt(packet, Lobby.blowFish);
 
