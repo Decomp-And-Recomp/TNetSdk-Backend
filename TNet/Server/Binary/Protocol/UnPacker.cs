@@ -48,6 +48,11 @@ internal class UnPacker : BufferReader
         return true;
     }
 
+    public ushort GetLength()
+    {
+        return header.m_sLength;
+    }
+
     public ushort GetProtocol()
     {
         return header.m_sProtocol;

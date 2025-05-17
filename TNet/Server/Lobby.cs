@@ -129,7 +129,14 @@ internal static class Lobby
 
         LobbyUtils.Decrypt(p, blowFish);
 
-        if (!unPacker.ParserPacket(p)) return;
+        if (!unPacker.ParserPacket(p))
+        {
+            Debug.LogWarning("UnPacker couldnt unpack the packet");
+            return;
+        }
+
+        if (unPacker.GetLength() != bytes.Length) 
+            Debug.Log($"Packet and bytes length doesnt match: {unPacker.GetLength()} - {bytes.Length}");
 
         if (unPacker.GetProtocol() > 2 || unPacker.GetProtocol() < 1)
         {

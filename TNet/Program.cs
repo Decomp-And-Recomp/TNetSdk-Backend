@@ -14,10 +14,10 @@ internal class Program
 
         Console.WriteLine("TNet Backend, made by overmet15.");
 
-        Console.WriteLine("Please write the port to host on...");
-
         if (!(args.Length > 0 && int.TryParse(args[0], out int port)))
         {
+            Console.WriteLine("Please write the port to host on...");
+
             while (true)
             {
                 if (int.TryParse(Console.ReadLine(), out port)) break;
