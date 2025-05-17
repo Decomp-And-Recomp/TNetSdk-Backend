@@ -208,7 +208,7 @@ internal class Room : IDisposable
         state = State.close;
     }
 
-    public void RemoveClient(Client client, bool disconnectClient = false)
+    public void RemoveClient(Client client)
     {
         if (state == State.shuttingDown) return;
 
