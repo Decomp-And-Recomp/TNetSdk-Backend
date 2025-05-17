@@ -1,3 +1,0 @@
-﻿namespace TNet.Server.ClientJunk;
-
-
