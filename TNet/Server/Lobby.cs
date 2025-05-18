@@ -102,6 +102,7 @@ internal static class Lobby
         byte[] buffer = new byte[maxDataLength];
         int read;
 
+        bool lengthCalculated = false;
         ushort length = 5;
 
         while (true)
@@ -119,61 +120,61 @@ internal static class Lobby
                 break;
             }
 
-            _ = Task.Run(() => OnReceive(buffer, read, client));
-
-            continue;
-
             recivied.AddRange(buffer.Take(read));
 
             // multi package checking
-            while (true)
+            while (recivied.Count > Header.HEADER_LENGTH)
             {
-                if (recivied.Count < Header.HEADER_LENGTH) break;
-
-                // FIXME ToDo: DONT CREATE THE FUCKING PACKET BRO WE DONT HAVE INFINITE RAM
-                Packet p = new(recivied.ToArray(), recivied.Count, true);
-
-                LobbyUtils.Decrypt(p, blowFish);
-
-                p.PopUInt16(ref length);
-
-                if (length > maxDataLength)
+                if (!lengthCalculated)
                 {
-                    Debug.Log("Data amount: " + length);
-                    DisconnectClient(client, DisconnectCode.TooMuchData);
-                    break;
-                }
-                if (length < Header.HEADER_LENGTH)
-                {
-                    Debug.Log("Data amount: " + length);
-                    DisconnectClient(client, DisconnectCode.TooShortData);
-                    break;
+                    lengthCalculated = true;
+                    length = GetLength(recivied);
+
+                    if (length > maxDataLength)
+                    {
+                        Debug.Log("Data amount: " + length);
+                        DisconnectClient(client, DisconnectCode.TooMuchData);
+                        break;
+                    }
+                    if (length < Header.HEADER_LENGTH)
+                    {
+                        Debug.Log("Data amount: " + length);
+                        DisconnectClient(client, DisconnectCode.TooShortData);
+                        break;
+                    }
                 }
 
                 if (recivied.Count < length) break;
 
-                byte[] bytes = new byte[length];
-
-                recivied.CopyTo(0, bytes, 0, length);
-
+                var bytes = recivied.GetRange(0, length).ToArray();
                 recivied.RemoveRange(0, length);
+                _ = Task.Run(() => OnReceive(bytes, client));
 
-                _ = Task.Run(() => OnReceive(bytes, length, client));
+                lengthCalculated = false;
             }
         }
     }
 
+    static ushort GetLength(List<byte> data)
+    {
+        byte[] bytes = data.Take(8).ToArray();
+
+        LobbyUtils.Decrypt(ref bytes, blowFish);
+
+        return WatchUInt16(bytes, 0);
+    }
+
     // ToDo: move somewhere else
-    public static ushort WatchUInt16(List<byte> data, int pos)
+    public static ushort WatchUInt16(byte[] data, int pos)
     {
         return (ushort)((data[pos] << 8) | data[pos + 1]);
     }
 
-    static void OnReceive(byte[] bytes, int length, Client client)
+    static void OnReceive(byte[] bytes, Client client)
     {
         UnPacker unPacker = new();
         
-        Packet p = new(bytes, length, false);
+        Packet p = new(bytes, bytes.Length, false);
 
         LobbyUtils.Decrypt(p, blowFish);
 
@@ -183,10 +184,8 @@ internal static class Lobby
             return;
         }
 
-        Debug.Log("Data amount: " + unPacker.GetLength());
-
-        if (unPacker.GetLength() != length) 
-            Debug.Log($"unPacker and bytes length doesnt match: {unPacker.GetLength()} - {length}");
+        if (unPacker.GetLength() != bytes.Length) 
+            Debug.Log($"unPacker and bytes length doesnt match: {unPacker.GetLength()} - {bytes.Length}");
 
         if (unPacker.GetProtocol() > 2 || unPacker.GetProtocol() < 1)
         {
