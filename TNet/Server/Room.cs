@@ -9,10 +9,16 @@ namespace TNet.Server;
 
 internal class Room : IDisposable
 {
-    struct VariableSet
+    class VariableSet(ushort userId, byte[] data)
     {
-        public ushort userId;
-        public byte[] data;
+        public ushort userId = userId;
+        public byte[] data = data;
+
+        public void Set(ushort userId, byte[] data)
+        {
+            this.userId = userId;
+            this.data = data;
+        }
     }
 
     public enum State { open, started, shuttingDown, close }
@@ -249,11 +255,8 @@ internal class Room : IDisposable
     {
         Debug.LogInfo("Set room variable");
 
-        vars[key] = new()
-        { 
-            userId = userId,
-            data = var
-        };
+        if (vars.TryGetValue(key, out var v)) v.Set(userId, var);
+        else vars[key] = new(userId, var);
 
         SendToAll(RoomVarNotifyCmd.Notify(userId, key, var));
     }
