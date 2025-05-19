@@ -159,7 +159,7 @@ internal static class Lobby
     {
         byte[] bytes = data.Take(8).ToArray();
 
-        LobbyUtils.Decrypt(ref bytes, blowFish);
+        LobbyUtils.Decrypt(ref bytes);
 
         return LobbyUtils.WatchUInt16(bytes, 0);
     }
@@ -170,7 +170,7 @@ internal static class Lobby
         
         Packet p = new(bytes, bytes.Length, false);
 
-        LobbyUtils.Decrypt(p, blowFish);
+        LobbyUtils.Decrypt(p);
 
         if (!unPacker.ParserPacket(p))
         {

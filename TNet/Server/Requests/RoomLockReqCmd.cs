@@ -4,16 +4,11 @@ using TNet.Server.Binary.Protocol;
 
 namespace TNet.Server.Requests;
 
-internal class RoomLockReqCmd
+internal static class RoomLockReqCmd
 {
-    public string password = string.Empty;
-
-    public static bool TryParse(UnPacker unPacker, out RoomLockReqCmd result)
+    public static bool TryParse(UnPacker unPacker, out string result)
     {
-        result = new();
-
-        if (!unPacker.PopString(ref result.password, Encoding.ASCII)) return false;
-
-        return true;
+        result = "";
+        return unPacker.PopString(ref result, Encoding.ASCII);
     }
 }

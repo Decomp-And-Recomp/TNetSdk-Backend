@@ -176,20 +176,20 @@ internal class Room : IDisposable
 
         Debug.LogInfo("Client connected, count: " + clients.Count);
 
-#pragma warning disable CS8604 // ToDo: THIS WILL BE REMOVED AFTER TESTING
         if (!isStarting && clients.Count > 1 && state == State.open)
         {
             isStarting = true;
 
             _ = Task.Run(async () =>
             {
-                await Task.Delay(10000);
-                if (state == State.open) Start(owner);
+                await Task.Delay(12000);
+#nullable disable
+                if (state == State.open && clients.Count > 1) Start(owner);
+                else isStarting = false;
+#nullable enable
             });
         }
-#pragma warning restore
     }
-
 
     public void ShutDown()
     {
@@ -269,7 +269,7 @@ internal class Room : IDisposable
         if (!clients.Contains(startedBy))
         {
             Debug.LogWarning("Lobby started by someone not in the room: " + state);
-            Lobby.DisconnectClient(startedBy, DisconnectCode.SuspiciousRequests);
+            //Lobby.DisconnectClient(startedBy, DisconnectCode.SuspiciousRequests);
             return;
         }
 
@@ -289,8 +289,6 @@ internal class Room : IDisposable
         owner = newOwner;
 
         SendToAll(RoomCreaterChangeNotifyCmd.Notify(owner.id));
-
-        Debug.LogInfo("Changed lobby owner");
 
         return true;
     }

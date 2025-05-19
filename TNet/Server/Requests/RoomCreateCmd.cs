@@ -37,7 +37,6 @@ internal class RoomCreateCmd
         if (!unPacker.PopUInt16(ref tempUshort)) return false;
         cmd.roomSwitchMasterType = (RoomSwitchMasterType)tempUshort;
 
-        // YES ITS AT THE END
         if (!unPacker.PopString(ref cmd.password, Encoding.ASCII)) return false;
 
         return true;

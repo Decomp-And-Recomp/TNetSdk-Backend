@@ -2,17 +2,13 @@ using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 
 namespace TNet.Server.Binary.Protocol;
 
-#pragma warning disable
-
 internal class UnPacker : BufferReader
 {
-    Header header;
+    readonly Header header = new();
 
     public virtual bool ParserPacket(Packet packet)
     {
         SetData(packet.ByteArray());
-        //Header header = new Header();
-        header = new Header();
         if (!PopUInt16(ref header.m_sLength))
         {
             return false;
@@ -35,9 +31,9 @@ internal class UnPacker : BufferReader
         }
         if (header.m_sCompressType == 1)
         {
-            InflaterInputStream inflaterInputStream = new InflaterInputStream(new MemoryStream(m_data, m_offset, m_data.Length - m_offset));
-            MemoryStream memoryStream = new MemoryStream();
-            int num = 0;
+            InflaterInputStream inflaterInputStream = new(new MemoryStream(m_data, m_offset, m_data.Length - m_offset));
+            MemoryStream memoryStream = new();
+            int num;
             byte[] array = new byte[4096];
             while ((num = inflaterInputStream.Read(array, 0, array.Length)) != 0)
             {

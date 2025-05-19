@@ -15,7 +15,7 @@ internal static class RoomDragListResCmd
         packer.PushUInt16(pageSum); // page length?
         packer.PushUInt16((ushort)listType);
 
-        List<Room> list = listType switch
+        List<Room> rooms = listType switch
         {
             RoomDragListType.all => Lobby.rooms
                 .OrderBy(kv => kv.Key)
@@ -43,15 +43,13 @@ internal static class RoomDragListResCmd
             _ => [],
         };
 
-        packer.PushUInt16((ushort)list.Count); // send rooms length
-
-        Debug.LogInfo("Room count: " + list.Count);
+        packer.PushUInt16((ushort)rooms.Count);
 
         SerializedRoomInfo info;
 
-        for (int i = 0; i < list.Count; i++)
+        for (int i = 0; i < rooms.Count; i++)
         {
-            info = SerializedRoomInfo.FromRoom(list[i]);
+            info = SerializedRoomInfo.FromRoom(rooms[i]);
 
             packer.PushUInt16(info.roomId);
             packer.PushUInt16(info.groupId);

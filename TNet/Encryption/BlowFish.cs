@@ -1,7 +1,5 @@
 namespace TNet.Encryption;
 
-#pragma warning disable
-
 internal class BlowFish
 {
 	private readonly uint[,] S = new uint[4, 256];
@@ -155,8 +153,8 @@ internal class BlowFish
 			}
 			P[num] = def_P[num] ^ num4;
 		}
-		uint num5 = 0u;
-		uint num6 = 0u;
+		uint num5;
+		uint num6;
 		ulong input = 0uL;
 		for (uint num = 0u; num < 18; num += 2)
 		{
@@ -221,7 +219,7 @@ internal class BlowFish
 
 	private ulong F(ulong input)
 	{
-		ulong num = 0uL;
+		ulong num;
 		uint num2 = (uint)(input & 0xFF);
 		input >>= 8;
 		uint num3 = (uint)(input & 0xFF);
@@ -229,7 +227,7 @@ internal class BlowFish
 		uint num4 = (uint)(input & 0xFF);
 		input >>= 8;
 		uint num5 = (uint)(input & 0xFF);
-		input >>= 8;
+		//input >>= 8;
 		num = S[0, num2] + S[1, num3];
 		num &= 0xFFFFFFFFu;
 		num ^= S[2, num4];

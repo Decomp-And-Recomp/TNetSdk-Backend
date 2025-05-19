@@ -1,15 +1,14 @@
 namespace TNet.Server.Binary;
 
-#pragma warning disable
 internal class Packet
 {
 	public const int MAX_PACKET_SIZE = 4096;
 
-	private byte[] TEMP_BYTE_ARRAY;
+	byte[] TEMP_BYTE_ARRAY = null!;
 
-	private int CURRENT_LENGTH;
+	int CURRENT_LENGTH;
 
-	private int CURRENT_POSITION;
+	int CURRENT_POSITION;
 
 	public int Length
 	{
@@ -146,7 +145,9 @@ internal class Packet
 		return true;
 	}
 
-	public bool PushByteArray(byte[] buf, int length)
+	public bool PushByteArray(byte[] buf) => PushByteArray(buf, buf.Length);
+
+    public bool PushByteArray(byte[] buf, int length)
 	{
 		if (!CheckBytesLeft(length))
 		{

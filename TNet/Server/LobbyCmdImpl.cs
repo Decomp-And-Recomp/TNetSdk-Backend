@@ -27,14 +27,14 @@ internal static class LobbyCmdImpl
         if (!SysLoginCmd.TryParse(unPacker, out var request))
         {
             LobbyUtils.LogBadUnpacker("OnRoomDragList");
-            //await Send(SysLoginResCmd.Response(SysLoginResCmd.Result.error_pwd, client.id, request.nickname), client);
             return;
         }
 
         client.isLogged = true;
         client.nickname = request.nickname;
 
-        Debug.Log($"New user '{request.account}' idenefied as \"{request.nickname}\"");
+        //Debug.Log($"New user '{request.account}' idenefied as \"{request.nickname}\"");
+        Debug.Log($"New user, idenefied as \"{request.nickname}\"");
 
         await LobbyUtils.SendToClient(SysLoginResCmd.Response(LoginResult.ok, client.id, request.nickname), client);
     }
@@ -160,7 +160,7 @@ internal static class LobbyCmdImpl
 
     public static void OnRoomLockReq(UnPacker unPacker, Client client)
     {
-        if (!RoomLockReqCmd.TryParse(unPacker, out var cmd))
+        if (!RoomLockReqCmd.TryParse(unPacker, out var password))
         {
             LobbyUtils.LogBadUnpacker("OnRoomLockReq");
             return;
@@ -172,9 +172,7 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        client.room.Lock(client, cmd.password);
-
-        //client.room.SendToAll(RoomMsgNotifyCmd.Notify(client.id, cmd.bytes));
+        client.room.Lock(client, password);
     }
 
     public static void OnRoomStart(Client client)

@@ -28,24 +28,24 @@ internal class LobbyUtils
         return (ushort)((data[pos] << 8) | data[pos + 1]);
     }
 
-    public static void Decrypt(Packet packet, BlowFish fish)
+    public static void Decrypt(Packet packet)
     {
         ulong val = 0;
 
         packet.Position = 0;
         packet.PopUInt64(ref val);
-        fish.Decrypt(ref val);
+        Lobby.blowFish.Decrypt(ref val);
         packet.Position = 0;
         packet.PushUInt64(val);
     }
 
-    public static void Decrypt(ref byte[] data, BlowFish fish)
+    public static void Decrypt(ref byte[] data)
     {
         uint num = (uint)((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
         uint num2 = (uint)((data[4] << 24) | (data[5] << 16) | (data[6] << 8) | data[7]);
         ulong num3 = num;
         num3 = (num3 << 32) + num2;
-        fish.Decrypt(ref num3);
+        Lobby.blowFish.Decrypt(ref num3);
         num = (uint)(num3 >> 32);
         num2 = (uint)num3;
         data[0] = (byte)(((num & 0xFF000000u) >> 24) & 0xFFu);
@@ -59,7 +59,7 @@ internal class LobbyUtils
     }
 
 #pragma warning disable
-    public static void Encrypt(Packet packet, BlowFish fish)
+    public static void Encrypt(Packet packet)
     {
         /*ulong val = 0;
 
@@ -111,28 +111,18 @@ internal class LobbyUtils
 
     public static async Task SendToClient(Packet packet, Client client)
     {
-        if (client.disconnected)
-        {
-            //Debug.LogError("Client disconnected");
-            return;
-        }
+        if (client.disconnected) return;
 
-        Encrypt(packet, Lobby.blowFish);
+        Encrypt(packet);
 
         byte[] bytes = new byte[packet.Length];
 
         packet.Position = 0;
-
-        if (!packet.PopByteArray(ref bytes, packet.Length))
-        {
-            Debug.LogError("Packet Fail");
-            return;
-        }
+        packet.PopByteArray(ref bytes, packet.Length);
 
         try
         {
             await client.connection.GetStream().WriteAsync(bytes);
-            //Debug.LogInfo("Sent");
         }
         catch (Exception ex)
         {

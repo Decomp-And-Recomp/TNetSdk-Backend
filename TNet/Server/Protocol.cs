@@ -1,6 +1,6 @@
 ﻿namespace TNet.Server;
 
-public enum Protocol
+internal enum Protocol
 {
     //version = 1,
     //none = 0,

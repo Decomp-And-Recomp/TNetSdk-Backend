@@ -1,15 +1,8 @@
 namespace TNet.Server.Binary;
 
-#pragma warning disable
-
 internal class BufferWriter
 {
-	private List<byte> m_data;
-
-	public void SetData(List<byte> data)
-	{
-		m_data = data;
-	}
+	protected List<byte> m_data = [];
 
 	public void PushByte(byte b)
 	{
@@ -54,6 +47,6 @@ internal class BufferWriter
 
 	public byte[] ToByteArray()
 	{
-		return m_data.ToArray();
+        return [.. m_data];
 	}
 }

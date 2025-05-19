@@ -1,8 +1,9 @@
 ﻿using System.Text;
+using TNet.Exceptions;
 
 namespace TNet.Server.Data;
 
-internal struct SerializedRoomInfo
+internal class SerializedRoomInfo
 {
     public ushort roomId {  get; private set; }
     public ushort groupId { get; private set; }
@@ -10,18 +11,17 @@ internal struct SerializedRoomInfo
     public ushort onlineUsers { get; private set; }
     public ushort maxUsers { get; private set; }
     public ushort state { get; private set; } //TNetRoom.isGaming (Client)
-    public ushort passworded { get; private set; }                                                                      
-    public byte[] roomName { get; private set; }
-    public byte[] creatorName { get; private set; }
-    public byte[] roomComment { get; private set; }
+    public ushort passworded { get; private set; }
+    public byte[] roomName { get; private set; } = null!;
+    public byte[] creatorName { get; private set; } = null!;
+    public byte[] roomComment { get; private set; } = null!;
+
+    SerializedRoomInfo() { }
 
     public static SerializedRoomInfo FromRoom(Room room)
     {
         if (room.owner == null)
-        {
-            Debug.LogError("Cannot create SerializedRoomInfo without owner being set, this CANNOT happen and requires attention.");
-            return new();
-        }
+            throw new MissingRoomOwnerException();
 
         byte[] ownerNameArray = new byte[16], roomNameArray = new byte[16], roomCommentArray = new byte[64];
 
