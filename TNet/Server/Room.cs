@@ -71,7 +71,7 @@ internal class Room : IDisposable
 
         _ = room.CreationLogic();
 
-        LobbyUtils.Log($"Created new room with: id={room.id}, maxUsers={room.maxUsers}, {room.masterSwitchType}, {room.roomType}", ConsoleColor.Cyan);
+        Debug.Log($"Created new room with: id={room.id}, maxUsers={room.maxUsers}, {room.masterSwitchType}, {room.roomType}", ConsoleColor.Cyan);
 
         return true;
     }

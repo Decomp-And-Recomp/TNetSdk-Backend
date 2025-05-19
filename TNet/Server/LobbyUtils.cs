@@ -5,11 +5,6 @@ namespace TNet.Server;
 
 internal class LobbyUtils
 {
-    public static void Log(object message, ConsoleColor color = ConsoleColor.White)
-    {
-        Debug.Log("[Lobby] " + message, color);
-    }
-
     public static void LogBadUnpacker(object message)
     {
         Debug.Log("[Lobby:Bad Unpacker] " + message, ConsoleColor.DarkRed);
@@ -24,7 +19,7 @@ internal class LobbyUtils
     {
         //Log("New connection from: " + ((IPEndPoint)client.connection.Client.RemoteEndPoint).Address.ToString()
         //    + " id:" + client.id);
-        Log("New connection, id: " + client.id);
+        Debug.Log("New connection, id: " + client.id);
     }
 #pragma warning restore
 

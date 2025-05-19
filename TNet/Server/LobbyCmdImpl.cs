@@ -34,7 +34,7 @@ internal static class LobbyCmdImpl
         client.isLogged = true;
         client.nickname = request.nickname;
 
-        LobbyUtils.Log($"New user '{request.account}' idenefied as \"{request.nickname}\"");
+        Debug.Log($"New user '{request.account}' idenefied as \"{request.nickname}\"");
 
         await LobbyUtils.SendToClient(SysLoginResCmd.Response(LoginResult.ok, client.id, request.nickname), client);
     }
@@ -61,7 +61,7 @@ internal static class LobbyCmdImpl
 
         if (!Room.TryCreate(cmd, out _, client))
         {
-            LobbyUtils.Log("Couldnt create new room. (full?)", ConsoleColor.Red);
+            Debug.Log("Couldnt create new room. (full?)", ConsoleColor.Red);
             _ = LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.full, 0), client);
         }
     }

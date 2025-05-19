@@ -34,7 +34,7 @@ internal class Client : IDisposable
 
             if (missedHeartbeatCounter > 8)
             {
-                LobbyUtils.Log("Client havent sent anything in a while, removing..");
+                Debug.Log("Client havent sent anything in a while, removing..");
                 Disconnect();
                 break;
             }
@@ -49,17 +49,17 @@ internal class Client : IDisposable
 
         disconnected = true;
 
-        LobbyUtils.Log("Removing: " + id, ConsoleColor.DarkRed);
+        Debug.Log("Removing: " + id, ConsoleColor.DarkRed);
         Debug.LogStack();
 
         if (Lobby.clients.TryRemove(id, out var removed))
         {
             if (removed != null && removed != this)
-                LobbyUtils.Log("We deadass just disconnected random player 💀", ConsoleColor.DarkMagenta);
+                Debug.Log("We deadass just disconnected random player 💀", ConsoleColor.DarkMagenta);
         }
         else
         {
-            LobbyUtils.Log("Player wasnt removed from dictionary properly.", ConsoleColor.DarkRed);
+            Debug.Log("Player wasnt removed from dictionary properly.", ConsoleColor.DarkRed);
         }
 
         RemoveFromRoom();

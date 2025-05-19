@@ -48,7 +48,7 @@ internal static class Lobby
             return;
         }
 
-        LobbyUtils.Log($"Lobby now running on port {port}", ConsoleColor.Green);
+        Debug.Log($"Lobby now running on port {port}", ConsoleColor.Green);
 
         await ServerLoop();
     }
@@ -88,7 +88,7 @@ internal static class Lobby
 
         if (!added)
         {
-            LobbyUtils.Log("Unable to add new client, disconnecting.", ConsoleColor.Red);
+            Debug.Log("Unable to add new client, disconnecting.", ConsoleColor.Red);
             DisconnectClient(client, DisconnectCode.CouldntAddToDictionary);
             return;
         }
@@ -247,7 +247,7 @@ internal static class Lobby
     {
         if (client.disconnected) return;
 
-        LobbyUtils.Log("Disconnected player: " + code);
+        Debug.Log("Disconnected player: " + code);
         if (code == DisconnectCode.SuspiciousRequests)
         {
             Debug.LogStack(ConsoleColor.DarkMagenta);
