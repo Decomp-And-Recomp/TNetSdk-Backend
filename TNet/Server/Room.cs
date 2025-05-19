@@ -283,6 +283,25 @@ internal class Room : IDisposable
         SendToAll(RoomVarNotifyCmd.Notify(userId, key, var));
     }
 
+    public void Start()
+    {
+        if (state != State.open)
+        {
+            Debug.LogWarning("Room has to be open, but the state is: " + state);
+            return;
+        }
+
+        if (owner == null)
+        {
+            Debug.LogWarning("Cannot start the room without an owner.");
+            return;
+        }
+
+        state = State.started;
+
+        SendToAll(RoomStartNotifyCmd.Notify(owner.id));
+    }
+
     public void Start(Client startedBy)
     {
         if (state != State.open)
