@@ -25,7 +25,7 @@ internal enum RoomCMD
     user_var_notify = 20,
     set_user_status = 21,
     user_status_notify = 22,
-	send_msg = 23, // Unused?
+	send_msg = 23,
 	broadcast_msg = 24,
     msg_notify = 25,
     lock_req = 26,

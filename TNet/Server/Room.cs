@@ -94,6 +94,28 @@ internal class Room : IDisposable
         _ = TryConnectClient(owner, password);
     }
 
+    /*public void SendToId(ushort id, params Packet[] packets)
+    {
+        foreach (Client c in clients)
+        {
+            if (c.id == id)
+            {
+                _ = LobbyUtils.SendToClient(c, packets);
+                break;
+            }
+        }
+    }*/
+    
+    public void SendToId(ushort id, params Packet[] packets)
+    {
+        if (Lobby.clients.TryGetValue(id, out Client? c))
+        {
+            if (clients.Contains(c)) _ = LobbyUtils.SendToClient(c, packets);
+            else Debug.Log("Player wasnt in the room, id: " + id, ConsoleColor.Red);
+        }
+        else Debug.Log("PLayer wasnt in Lobby.clients, id: " + id, ConsoleColor.Red);
+    }
+
     public void SendToAll(Packet packet)
     {
         foreach (Client c in clients)

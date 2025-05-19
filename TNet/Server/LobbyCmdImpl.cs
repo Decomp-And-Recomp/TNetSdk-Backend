@@ -140,6 +140,24 @@ internal static class LobbyCmdImpl
         client.SetUserVar(cmd.key, cmd.data);
     }
 
+    public static void OnRoomSendMsg(UnPacker unPacker, Client client)
+    {
+        if (!RoomSendMsgCmd.TryParse(unPacker, out var cmd))
+        {
+            LobbyUtils.LogBadUnpacker("OnRoomBroadcastMsg");
+            Debug.Log(BitConverter.ToString(unPacker.ByteArray()).Replace("-", ""));
+            return;
+        }
+
+        if (client.room == null)
+        {
+            Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
+            return;
+        }
+
+        client.room.SendToId(cmd.user_id, RoomMsgNotifyCmd.Notify(client.id, cmd.data));
+    }
+
     public static void OnRoomBroadcastMsg(UnPacker unPacker, Client client)
     {
         if (!RoomBroadcastMsgCmd.TryParse(unPacker, out var cmd))
@@ -149,7 +167,7 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        if (client.room == null || cmd.bytes == null)
+        if (client.room == null)
         {
             Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
             return;

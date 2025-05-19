@@ -1,11 +1,10 @@
-using TNet.Server.Binary;
 using TNet.Server.Binary.Protocol;
 
-namespace TNet.Server.Cmd;
+namespace TNet.Server.Requests;
 
 internal class RoomBroadcastMsgCmd
 {
-	public byte[]? bytes;
+	public byte[] bytes = null!;
 
 	RoomBroadcastMsgCmd() { }
 
