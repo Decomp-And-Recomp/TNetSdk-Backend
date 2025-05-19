@@ -161,13 +161,7 @@ internal static class Lobby
 
         LobbyUtils.Decrypt(ref bytes, blowFish);
 
-        return WatchUInt16(bytes, 0);
-    }
-
-    // ToDo: move somewhere else
-    public static ushort WatchUInt16(byte[] data, int pos)
-    {
-        return (ushort)((data[pos] << 8) | data[pos + 1]);
+        return LobbyUtils.WatchUInt16(bytes, 0);
     }
 
     static void OnReceive(byte[] bytes, Client client)

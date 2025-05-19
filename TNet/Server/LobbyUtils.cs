@@ -27,6 +27,12 @@ internal class LobbyUtils
         Log("New connection, id: " + client.id);
     }
 #pragma warning restore
+
+    public static ushort WatchUInt16(byte[] data, int pos)
+    {
+        return (ushort)((data[pos] << 8) | data[pos + 1]);
+    }
+
     public static void Decrypt(Packet packet, BlowFish fish)
     {
         ulong val = 0;
