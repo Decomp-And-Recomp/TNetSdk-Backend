@@ -14,14 +14,13 @@ internal class LobbyUtils
     {
         Debug.Log("[Lobby:Unimplemented] " + message, ConsoleColor.DarkRed);
     }
-#pragma warning disable
+
     public static void LogNewConnection(Client client)
     {
         //Log("New connection from: " + ((IPEndPoint)client.connection.Client.RemoteEndPoint).Address.ToString()
         //    + " id:" + client.id);
         Debug.Log("New connection, id: " + client.id);
     }
-#pragma warning restore
 
     public static ushort WatchUInt16(byte[] data, int pos)
     {
@@ -30,6 +29,8 @@ internal class LobbyUtils
 
     public static void Decrypt(Packet packet)
     {
+        if (Lobby.blowFish == null) return;
+
         ulong val = 0;
 
         packet.Position = 0;
@@ -41,6 +42,8 @@ internal class LobbyUtils
 
     public static void Decrypt(ref byte[] data)
     {
+        if (Lobby.blowFish == null) return;
+
         uint num = (uint)((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
         uint num2 = (uint)((data[4] << 24) | (data[5] << 16) | (data[6] << 8) | data[7]);
         ulong num3 = num;
@@ -61,6 +64,8 @@ internal class LobbyUtils
 #pragma warning disable
     public static void Encrypt(Packet packet)
     {
+        if (Lobby.blowFish == null) return;
+
         /*ulong val = 0;
 
         packet.Position = 0;

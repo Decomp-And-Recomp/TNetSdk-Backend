@@ -14,19 +14,57 @@ internal class Program
 
         Console.WriteLine("TNet Backend, made by overmet15.");
 
-        if (!(args.Length > 0 && int.TryParse(args[0], out int port)))
+        InitEncryption(args);
+
+        await Lobby.Run(IPAddress.Any, InitPort(args));
+    }
+
+    static int InitPort(string[] args)
+    {
+        int parse;
+
+        for (int i = 0; i < args.Length; i++)
         {
-            Console.WriteLine("Please write the port to host on...");
+            if (args[i] != "-p") continue;
+            
+            if (i + 1 < args.Length)
+                if (int.TryParse(args[i + 1], out parse)) return parse;
 
-            while (true)
-            {
-                if (int.TryParse(Console.ReadLine(), out port)) break;
-
-                Console.WriteLine("Try again...");
-            }
+            break;
         }
 
-        _ = Task.Run(AdminPanel.Run);
-        await Lobby.Run(IPAddress.Any, port);
+        Console.WriteLine("Input port...");
+
+        while (true)
+        {
+            if (int.TryParse(Console.ReadLine(), out parse)) break;
+            else Console.WriteLine("Try again...");
+        }
+
+        return parse;
+    }
+
+    static void InitEncryption(string[] args)
+    {
+#if DEBUG
+        Lobby.blowFish = new("Triniti_Tlck");
+#else
+        // ToDo?: make it use "Triniti_Tlck" in DEBUG mode.
+
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (args[i] != "-k") continue;
+
+            if (i + 1 < args.Length) Lobby.blowFish = new(args[i+1]);
+
+            return;
+        }
+
+        Console.WriteLine("Input the encryption key...");
+        string? key = Console.ReadLine();
+
+        if (!string.IsNullOrWhiteSpace(key)) Lobby.blowFish = new(key);
+        else Console.WriteLine("No key provided, no encryption will be used.");
+#endif
     }
 }

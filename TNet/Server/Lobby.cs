@@ -14,8 +14,7 @@ internal static class Lobby
 {
     const int maxDataLength = 4096;
 
-    const string key = "Triniti_Tlck";
-    public static readonly BlowFish blowFish = new(key);
+    public static BlowFish? blowFish;
     static TcpListener? listener;
 
     public readonly static ConcurrentDictionary<ushort, Client> clients = [];
@@ -49,6 +48,8 @@ internal static class Lobby
         }
 
         Debug.Log($"Lobby now running on port {port}", ConsoleColor.Green);
+
+        _ = Task.Run(AdminPanel.Run);
 
         await ServerLoop();
     }
