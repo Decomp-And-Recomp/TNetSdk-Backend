@@ -21,16 +21,14 @@ internal class Program
 
     static int InitPort(string[] args)
     {
+#if DEBUG
+        return 6750;
+#else
         int parse;
 
-        for (int i = 0; i < args.Length; i++)
+        if (args.Length > 0)
         {
-            if (args[i] != "-p") continue;
-            
-            if (i + 1 < args.Length)
-                if (int.TryParse(args[i + 1], out parse)) return parse;
-
-            break;
+            if (int.TryParse(args[0], out parse)) return parse;
         }
 
         Console.WriteLine("Input port...");
@@ -42,6 +40,7 @@ internal class Program
         }
 
         return parse;
+#endif
     }
 
     static void InitEncryption(string[] args)
@@ -49,22 +48,20 @@ internal class Program
 #if DEBUG
         Lobby.blowFish = new("Triniti_Tlck");
 #else
-        // ToDo?: make it use "Triniti_Tlck" in DEBUG mode.
-
-        for (int i = 0; i < args.Length; i++)
+        if (args.Length > 1)
         {
-            if (args[i] != "-k") continue;
-
-            if (i + 1 < args.Length) Lobby.blowFish = new(args[i+1]);
-
-            return;
+            if (!string.IsNullOrWhiteSpace(args[1]))
+            {
+                Lobby.blowFish = new(args[1]);
+                return;
+            }
         }
 
         Console.WriteLine("Input the encryption key...");
         string? key = Console.ReadLine();
 
-        if (!string.IsNullOrWhiteSpace(key)) Lobby.blowFish = new(key);
-        else Console.WriteLine("No key provided, no encryption will be used.");
+        if (string.IsNullOrWhiteSpace(key)) Console.WriteLine("No key provided, no encryption will be used.");
+        else Lobby.blowFish = new(key);
 #endif
     }
 }
