@@ -236,7 +236,7 @@ internal class Room : IDisposable
         state = State.close;
     }
 
-    public void RemoveClient(Client client)
+    public void RemoveClient(Client client, bool kick)
     {
         if (state == State.shuttingDown) return;
 
@@ -252,14 +252,16 @@ internal class Room : IDisposable
         }
 
         // Yes you need to notify the removed player too
-        SendToAll(RoomLeaveNotifyCmd.Notify(client.id));
+        SendToAll(kick
+            ? RoomKickUserNotifyCmd.Notify(client.id)
+            : RoomLeaveNotifyCmd.Notify(client.id));
 
         clients.Remove(client);
 
         client.room = null;
 
-        if (state == State.started) 
-            Lobby.DisconnectClient(client, DisconnectCode.RoomLeave); // yes auto disconnect
+        if (kick) Lobby.DisconnectClient(client, DisconnectCode.RoomKick);
+        else if (state == State.started) Lobby.DisconnectClient(client, DisconnectCode.RoomLeave); // yes auto disconnect
 
         if (owner != client && owner != null) return;
 

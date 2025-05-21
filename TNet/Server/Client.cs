@@ -81,7 +81,7 @@ internal class Client : IDisposable
     {
         if (room == null) return;
 
-        room.RemoveClient(this);
+        room.RemoveClient(this, false);
     }
 
     public void Dispose() => Disconnect();

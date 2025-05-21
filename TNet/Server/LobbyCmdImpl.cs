@@ -106,6 +106,27 @@ internal static class LobbyCmdImpl
         client.RemoveFromRoom();
     }
 
+    public static void OnRoomKick(UnPacker unPacker, Client client)
+    {
+        ushort userId = 0;
+
+        if (!unPacker.PopUInt16(ref userId))
+        {
+            LobbyUtils.LogBadUnpacker("OnRoomKick");
+            return;
+        }
+
+        if (client.room == null || client.room.owner != client)
+        {
+            Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
+            return;
+        }
+
+        if (Lobby.clients.TryGetValue(userId, out Client? toKick)) 
+            client.room.RemoveClient(toKick, true);
+        else Debug.LogError("Tried kicking a player that doesnt even exist????");
+    }
+
     public static void OnRoomSetVar(UnPacker unPacker, Client client)
     {
         if (!RoomSetVarCmd.TryParse(unPacker, out var cmd))

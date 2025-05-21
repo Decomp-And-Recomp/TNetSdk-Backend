@@ -10,5 +10,6 @@ internal enum DisconnectCode
     SuspiciousRequests,
     RoomLeave,
     SocketDisconnect,
-    TooShortData
+    TooShortData,
+    RoomKick
 }
