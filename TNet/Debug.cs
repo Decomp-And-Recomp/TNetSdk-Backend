@@ -1,6 +1,6 @@
 ﻿namespace TNet;
 
-public static class Debug
+internal static class Debug
 {
     readonly struct Item(object? message, ConsoleColor color)
     {
@@ -8,11 +8,13 @@ public static class Debug
         public readonly ConsoleColor color = color;
     }
 
+    static int paused;
+
     static readonly object logLock = new();
 
     static readonly List<Item> items = [];
 
-    ///<summary>Logs message without any additional text.</summary>
+    ///<summary>Logs message with timestamp.</summary>
     public static void Log(object? message, ConsoleColor color = ConsoleColor.White)
     {
         lock (logLock)
@@ -23,7 +25,7 @@ public static class Debug
 
             if (string.IsNullOrEmpty(msg))
             {
-                LogWarning("The message was empty.");
+                LogWarning("[The message was empty.]");
                 return;
             }
 
@@ -39,6 +41,32 @@ public static class Debug
         }
     }
 
+
+    ///<summary>Logs message without any additional text.</summary>
+    public static void Write(object? message, ConsoleColor color = ConsoleColor.White)
+    {
+        lock (logLock)
+        {
+            string msg = message?.ToString() ?? string.Empty;
+
+            if (string.IsNullOrEmpty(msg))
+            {
+                LogWarning("[The message was empty.]");
+                return;
+            }
+
+            if (AdminPanel.isTyping || paused > 0)
+            {
+                items.Add(new(message, color));
+                return;
+            }
+
+            Console.ForegroundColor = color;
+            Console.WriteLine(msg);
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+    }
+
     /// <summary>
     /// Frees all the items that were hold due to AdminPanel being active.
     /// (if <see cref="AdminPanel.isTyping"/> is false)
@@ -47,7 +75,7 @@ public static class Debug
     {
         lock (logLock)
         {
-            if (AdminPanel.isTyping) return;
+            if (AdminPanel.isTyping || paused > 0) return;
 
             for (int i = 0; i < items.Count; i++)
             {
@@ -60,7 +88,13 @@ public static class Debug
         }
     }
 
-    public static void LogInfo(object msg) => Log(msg, ConsoleColor.Cyan);
+    ///<summary>Logs a 'DEBUG' BUILD ONLY log</summary>
+    public static void LogInfo(object msg, ConsoleColor color = ConsoleColor.Cyan)
+    {
+#if DEBUG
+        Log(msg, color);
+#endif
+    }
 
     ///<summary>Logs message and stack trace</summary>
     public static void LogWarning(object msg)
@@ -111,7 +145,11 @@ public static class Debug
 
     public static void Pause()
     {
+        paused++;
         Log("Press any key to continue..", ConsoleColor.DarkCyan);
         Console.ReadKey(false);
+        paused--;
+
+        Free();
     }
 }

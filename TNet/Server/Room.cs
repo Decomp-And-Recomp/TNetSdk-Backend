@@ -275,8 +275,6 @@ internal class Room : IDisposable
 
     public void SetRoomVariable(ushort userId, ushort key, byte[] var)
     {
-        Debug.LogInfo("Set room variable");
-
         if (vars.TryGetValue(key, out var v)) v.Set(userId, var);
         else vars[key] = new(userId, var);
 

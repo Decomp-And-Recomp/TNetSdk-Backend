@@ -7,17 +7,19 @@ internal static class AdminCommands
     public static void SetUp()
     {
         AdminPanel.RegisterCommand("client-list", ClientList, "Lists all clients.");
-        AdminPanel.RegisterCommand("client-disconnect", ClientDisconnect, "Put id(s) after command.");
+        AdminPanel.RegisterCommand("client-disconnect", ClientDisconnect, "Disconnects a client(s), Put id(s) after command.");
         AdminPanel.RegisterCommand("room-list", RoomList, "Lists all rooms.");
-        AdminPanel.RegisterCommand("room-start", RoomStart, "Put id(s) after command.");
-        AdminPanel.RegisterCommand("room-shut", RoomShut, "Put id(s) after command.");
+        AdminPanel.RegisterCommand("room-start", RoomStart, "Starts a room(s). Put id(s) after command.");
+        AdminPanel.RegisterCommand("room-shut", RoomShut, "Shuts a room(s). Put id(s) after command.");
     }
 
     static void ClientList(string[] arguments)
     {
+        Debug.Write("id|room id|disconnected|heartbeat counter|nick");
         foreach (Client c in Lobby.clients.Values)
         {
-            Debug.Log($"id:{c.id}, in_room:{c.room != null}, disconnected:{c.disconnected}, nick:{c.nickname} ");
+            if (c.room != null) Debug.Write($"{c.id}|{c.room.id}|{c.disconnected}|{c.missedHeartbeatCounter}|{c.nickname}");
+            Debug.Write($"{c.id}|N/A|{c.disconnected}|{c.missedHeartbeatCounter}|{c.nickname}");
         }
     }
 
@@ -27,13 +29,13 @@ internal static class AdminCommands
         {
             if (!ushort.TryParse(arg, out ushort result))
             {
-                Debug.Log("Unable to parse: " + arg, ConsoleColor.Yellow);
+                Debug.Write("Unable to parse: " + arg, ConsoleColor.Yellow);
                 continue;
             }
 
             if (!Lobby.clients.ContainsKey(result))
             {
-                Debug.Log("client list does not contain: " + arg, ConsoleColor.Yellow);
+                Debug.Write("client list does not contain: " + arg, ConsoleColor.Yellow);
                 continue;
             }
 
@@ -43,10 +45,11 @@ internal static class AdminCommands
 
     static void RoomList(string[] arguments)
     {
+        Debug.Write("id|owner id|client count");
         foreach (Room c in Lobby.rooms.Values)
         {
-            if (c.owner != null) Debug.Log($"id:{c.id}, owner id:{c.owner.id}, client count:{c.clients.Count}");
-            else Debug.Log($"id:{c.id}, OWNER IS NULL, client count:{c.clients.Count}", ConsoleColor.Yellow);
+            if (c.owner != null) Debug.Log($"{c.id}|{c.owner.id}|{c.clients.Count}");
+            else Debug.Log($"id:{c.id}|N/A|{c.clients.Count}", ConsoleColor.Red);
         }
     }
 
