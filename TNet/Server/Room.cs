@@ -153,10 +153,9 @@ internal class Room : IDisposable
         foreach (Client c in clients)
            if (!excludeClients.Contains(c)) _ = LobbyUtils.SendToClient(packet, c);
     }
-#pragma warning disable IDE0060
+
     public async Task TryConnectClient(Client client, string? password)
     {
-#pragma warning restore
         // Password check is disabled for now
         /*
         if (!string.IsNullOrWhiteSpace(this.password))
@@ -356,6 +355,20 @@ internal class Room : IDisposable
     }
 #pragma warning restore
 
+    public void Rename(string newName, Client client)
+    {
+        /*if (client != owner)
+        {
+            // ur not owner lil bro
+            //return;
+        }*/
+
+        name = newName;
+
+        Debug.LogInfo("Set room name to: " + name);
+
+        SendToAll(RoomRenameNotifyCmd.Notify(client.id, newName));
+    }
     /*public void Unlock(Client client, string pwd)
     {
 

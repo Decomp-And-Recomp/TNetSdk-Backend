@@ -127,6 +127,23 @@ internal static class LobbyCmdImpl
         else Debug.LogError("Tried kicking a player that doesnt even exist????");
     }
 
+    public static void OnRoomRename(UnPacker unPacker, Client client)
+    {
+        if (!RoomRenameCmd.TryParse(unPacker, out RoomRenameCmd cmd))
+        {
+            LobbyUtils.LogBadUnpacker("OnRoomRename");
+            return;
+        }
+
+        if (client.room == null)
+        {
+            Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
+            return;
+        }
+
+        client.room.Rename(cmd.roomName, client);
+    }
+
     public static void OnRoomSetVar(UnPacker unPacker, Client client)
     {
         if (!RoomSetVarCmd.TryParse(unPacker, out var cmd))
