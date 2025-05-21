@@ -63,6 +63,8 @@ internal class LobbyUtils
 
     public static void Encrypt(Packet packet)
     {
+        return;
+
         if (Lobby.blowFish == null) return;
 
         byte[] data = new byte[8];
