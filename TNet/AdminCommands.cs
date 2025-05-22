@@ -19,7 +19,7 @@ internal static class AdminCommands
         foreach (Client c in Lobby.clients.Values)
         {
             if (c.room != null) Debug.Write($"{c.id}|{c.room.id}|{c.disconnected}|{c.missedHeartbeatCounter}|{c.nickname}");
-            Debug.Write($"{c.id}|N/A|{c.disconnected}|{c.missedHeartbeatCounter}|{c.nickname}");
+            else Debug.Write($"{c.id}|N/A|{c.disconnected}|{c.missedHeartbeatCounter}|{c.nickname}");
         }
     }
 
