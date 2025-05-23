@@ -108,14 +108,22 @@ internal static class Lobby
 
         while (true)
         {
-            read = await stream.ReadAsync(buffer);
+            try
+            {
+                read = await stream.ReadAsync(buffer);
+            }
+            catch
+            {
+                DisconnectClient(client, DisconnectCode.ReadException);
+                return;
+            }
 
             if (read == 0)
             {
                 DisconnectClient(client, DisconnectCode.SocketDisconnect);
                 break;
             }
-            else if (read > maxDataLength)
+            if (read > maxDataLength)
             {
                 DisconnectClient(client, DisconnectCode.TooMuchData);
                 break;
@@ -188,7 +196,7 @@ internal static class Lobby
             return;
         }
 
-        //LobbyUtils.Log($"Protocol-{unPacker.GetProtocol()} Cmd-{unPacker.GetCmd()}", ConsoleColor.Cyan);
+        Debug.Log($"Protocol-{unPacker.GetProtocol()} Cmd-{unPacker.GetCmd()}", ConsoleColor.Cyan);
 
         if (unPacker.GetProtocol() == 1)
         {

@@ -12,11 +12,24 @@ internal class Program
         Console.InputEncoding = Encoding.UTF8;
         Console.OutputEncoding = Encoding.UTF8;
 
+        TaskScheduler.UnobservedTaskException += OnTaskException;
+
         Console.WriteLine("TNet Backend, made by overmet15.");
 
         InitEncryption(args);
 
         await Lobby.Run(IPAddress.Any, InitPort(args));
+    }
+
+    static void OnTaskException(object? sender, UnobservedTaskExceptionEventArgs args)
+    {
+        Debug.Log("UNOBSERVED EXCEPTION(S):", ConsoleColor.DarkRed);
+        foreach (Exception ex in args.Exception.InnerExceptions)
+        {
+            Debug.LogException(ex);
+        }
+
+        args.SetObserved();
     }
 
     static int InitPort(string[] args)

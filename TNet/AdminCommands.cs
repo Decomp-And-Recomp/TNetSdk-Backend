@@ -6,6 +6,7 @@ internal static class AdminCommands
 {
     public static void SetUp()
     {
+        AdminPanel.RegisterCommand("GCC", (s) => { System.GC.Collect(); }, "Calls System.GC.Collect().");
         AdminPanel.RegisterCommand("client-list", ClientList, "Lists all clients.");
         AdminPanel.RegisterCommand("client-disconnect", ClientDisconnect, "Disconnects a client(s), Put id(s) after command.");
         AdminPanel.RegisterCommand("room-list", RoomList, "Lists all rooms.");
@@ -18,8 +19,8 @@ internal static class AdminCommands
         Debug.Write("id|room id|disconnected|heartbeat counter|nick");
         foreach (Client c in Lobby.clients.Values)
         {
-            if (c.room != null) Debug.Write($"{c.id}|{c.room.id}|{c.disconnected}|{c.missedHeartbeatCounter}|{c.nickname}");
-            else Debug.Write($"{c.id}|N/A|{c.disconnected}|{c.missedHeartbeatCounter}|{c.nickname}");
+            if (c.room != null) Debug.Write($"{c.id}|{c.room.id}|{c.disconnected}|{c.missedHeartbeatCounter}|\"{c.nickname}\"");
+            else Debug.Write($"{c.id}|N/A|{c.disconnected}|{c.missedHeartbeatCounter}|\"{c.nickname}\"");
         }
     }
 
