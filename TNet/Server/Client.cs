@@ -32,7 +32,7 @@ internal class Client : IDisposable
         {
             missedHeartbeatCounter++;
 
-            if (missedHeartbeatCounter > 8 || connection.Connected)
+            if (missedHeartbeatCounter > 8 || !connection.Connected)
             {
                 Debug.Log("Client havent sent anything in a while, removing..");
                 Disconnect();
