@@ -29,6 +29,22 @@ internal static class AdminPanel
         isRunning = true;
         Debug.Log("Press / to input command, input ? for help.");
 
+        try
+        {
+            InnerConsoleLogic();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException("Exception in AdminPanel", ex);
+            isTyping = false;
+            isRunning = false;
+            Debug.Free();
+            Run();
+        }
+    }
+
+    static void InnerConsoleLogic()
+    {
         while (true)
         {
             if (Console.ReadKey(true).KeyChar == '/')

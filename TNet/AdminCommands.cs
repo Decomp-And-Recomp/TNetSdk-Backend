@@ -34,23 +34,23 @@ internal static class AdminCommands
                 continue;
             }
 
-            if (!Lobby.clients.ContainsKey(result))
+            if (!Lobby.clients.TryGetValue(result, out Client? theClient))
             {
                 Debug.Write("client list does not contain: " + arg, ConsoleColor.Yellow);
                 continue;
             }
 
-            Lobby.clients[result].Disconnect();
+            theClient.Disconnect();
         }
     }
 
     static void RoomList(string[] arguments)
     {
-        Debug.Write("id|owner id|client count");
+        Debug.Write("id|owner id|client count|state");
         foreach (Room c in Lobby.rooms.Values)
         {
-            if (c.owner != null) Debug.Log($"{c.id}|{c.owner.id}|{c.clients.Count}");
-            else Debug.Log($"id:{c.id}|N/A|{c.clients.Count}", ConsoleColor.Red);
+            if (c.owner != null) Debug.Write($"{c.id}|{c.owner.id}|{c.clients.Count}|{c.state}");
+            else Debug.Write($"id:{c.id}|N/A|{c.clients.Count}|{c.state}", ConsoleColor.Red);
         }
     }
 
@@ -60,19 +60,19 @@ internal static class AdminCommands
         {
             if (!ushort.TryParse(arg, out ushort result))
             {
-                Debug.Log("Unable to parse: " + arg, ConsoleColor.Yellow);
+                Debug.Write("Unable to parse: " + arg, ConsoleColor.Yellow);
                 continue;
             }
 
-            if (!Lobby.rooms.ContainsKey(result))
+            if (!Lobby.rooms.TryGetValue(result, out Room? theRoom))
             {
-                Debug.Log("room list does not contain: " + arg, ConsoleColor.Yellow);
+                Debug.Write("room list does not contain: " + arg, ConsoleColor.Yellow);
                 continue;
             }
 
-            Debug.Log($"Starting room {arg}...");
+            Debug.Write($"Starting room {arg}...");
 
-            Lobby.rooms[result].Start();
+            theRoom.Start();
         }
     }
 
@@ -82,19 +82,19 @@ internal static class AdminCommands
         {
             if (!ushort.TryParse(arg, out ushort result))
             {
-                Debug.Log("Unable to parse: " + arg, ConsoleColor.Yellow);
+                Debug.Write("Unable to parse: " + arg, ConsoleColor.Yellow);
                 continue;
             }
 
-            if (!Lobby.rooms.ContainsKey(result))
+            if (!Lobby.rooms.TryGetValue(result, out Room? theRoom))
             {
-                Debug.Log("room list does not contain: " + arg, ConsoleColor.Yellow);
+                Debug.Write("room list does not contain: " + arg, ConsoleColor.Yellow);
                 continue;
             }
 
-            Debug.Log($"Shutting room {arg}...");
+            Debug.Write($"Shutting room {arg}...");
 
-            Lobby.rooms[result].ShutDown();
+            theRoom.ShutDown();
         }
     }
 }

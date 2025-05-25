@@ -90,8 +90,13 @@ internal class Room : IDisposable
             ShutDown();
             return;
         }
+
         await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, id), owner);
+
+        // TLCK ONLY
         _ = TryConnectClient(owner, password);
+        // else
+        //clients.Add(owner);
     }
 
     /*public void SendToId(ushort id, params Packet[] packets)
@@ -156,6 +161,12 @@ internal class Room : IDisposable
 
     public async Task TryConnectClient(Client client, string? password)
     {
+        if (clients.Contains(client))
+        {
+            Debug.LogError("Client is already connected to the room.");
+            return;
+        }
+
         // Password check is disabled for now
         /*
         if (!string.IsNullOrWhiteSpace(this.password))

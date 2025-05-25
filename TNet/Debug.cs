@@ -128,6 +128,7 @@ internal static class Debug
 #pragma warning disable
     public static void LogStack(ConsoleColor color = ConsoleColor.White)
     {
+#if DEBUG
         System.Diagnostics.StackTrace stackTrace = new(true);
 
         for (int i = 1; i < stackTrace.FrameCount; i++) // yes i is supposed to start with 1
@@ -140,16 +141,19 @@ internal static class Debug
 
             Log($"{className}.{methodName}:{line}", color);
         }
+#endif
     }
 #pragma warning restore
 
     public static void Pause()
     {
+#if DEBUG
         paused++;
         Log("Press any key to continue..", ConsoleColor.DarkCyan);
         Console.ReadKey(false);
         paused--;
 
         Free();
+#endif
     }
 }

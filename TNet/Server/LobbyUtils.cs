@@ -70,11 +70,24 @@ internal class LobbyUtils
         packet.Position = 0;
         packet.PopByteArray(ref data, 8);
 
+        Encrypt(ref data);
+
+        packet.Position = 0;
+        packet.PushByteArray(data);
+    }
+
+    public static void Encrypt(ref byte[] data)
+    {
+        // we are not using it anywhere else rn and running null check twise is stupid.
+        //if (Lobby.blowFish == null) return;
+
         uint num = (uint)((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
         uint num2 = (uint)((data[4] << 24) | (data[5] << 16) | (data[6] << 8) | data[7]);
         ulong num3 = num;
         num3 = (num3 << 32) + num2;
+#nullable disable
         Lobby.blowFish.Encrypt(ref num3);
+#nullable enable
         num = (uint)(num3 >> 32);
         num2 = (uint)num3;
         data[0] = (byte)(((num & 0xFF000000u) >> 24) & 0xFFu);
@@ -85,9 +98,6 @@ internal class LobbyUtils
         data[5] = (byte)(((num2 & 0xFF0000) >> 16) & 0xFFu);
         data[6] = (byte)(((num2 & 0xFF00) >> 8) & 0xFFu);
         data[7] = (byte)(num2 & 0xFFu & 0xFFu);
-
-        packet.Position = 0;
-        packet.PushByteArray(data);
     }
 
     /*
@@ -130,7 +140,7 @@ internal class LobbyUtils
 
     public static async Task SendToClient(Packet packet, Client client)
     {
-        if (client.disconnected) return;
+        if (client.disconnected || !client.connection.Connected) return;
 
         Encrypt(packet);
 
