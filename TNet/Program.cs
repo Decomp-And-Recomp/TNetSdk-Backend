@@ -18,7 +18,13 @@ internal class Program
 
         InitEncryption(args);
 
-        await Lobby.Run(IPAddress.Any, InitPort(args));
+        _ = Debug.StartFileWriting();
+
+#if DEBUG
+        await Lobby.Run(IPAddress.Any, InitPort(args), Game.dinoHunter);
+#else
+        await Lobby.Run(IPAddress.Any, InitPort(args), Game.dinoHunter); // make game a argument on app launch
+#endif
     }
 
     static void OnTaskException(object? sender, UnobservedTaskExceptionEventArgs args)
@@ -59,7 +65,7 @@ internal class Program
     static void InitEncryption(string[] args)
     {
 #if DEBUG
-        Lobby.blowFish = new("Triniti_Tlck");
+        //Lobby.blowFish = new("Triniti_Tlck");
 #else
         if (args.Length > 1)
         {

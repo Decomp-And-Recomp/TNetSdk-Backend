@@ -14,6 +14,44 @@ internal static class Debug
 
     static readonly List<Item> items = [];
 
+    static List<string>? fileWriteQueue;
+
+    public static async Task StartFileWriting()
+    {
+        if (fileWriteQueue != null)
+        {
+            LogError("File Writing is already started");
+            return;
+        }
+        fileWriteQueue = [];
+
+
+        if (!Directory.Exists("Logs")) Directory.CreateDirectory("Logs");
+
+        string path = Path.Combine("Logs", DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss") + ".txt");
+        File.Create(path).Close();
+
+        Log("Started saving logs in: " + Path.Combine(Directory.GetCurrentDirectory(), path);
+
+        List<string> toWrite = [];
+
+        while (true)
+        {
+            while (fileWriteQueue.Count > 0)
+            {
+                toWrite.AddRange(fileWriteQueue);
+                fileWriteQueue.Clear();
+
+                await File.WriteAllLinesAsync(path, toWrite);
+                toWrite.Clear();
+
+                await Task.Yield();
+            }
+
+            await Task.Delay(1);
+        }
+    }
+
     ///<summary>Logs message with timestamp.</summary>
     public static void Log(object? message, ConsoleColor color = ConsoleColor.White)
     {
@@ -35,8 +73,11 @@ internal static class Debug
                 return;
             }
 
+            string postMsg = time.ToString("[HH:mm:ss:fff] ") + msg;
+
+            fileWriteQueue?.Add(postMsg);
             Console.ForegroundColor = color;
-            Console.WriteLine(time.ToString("[HH:mm:ss:fff] ") + msg);
+            Console.WriteLine(postMsg);
             Console.ForegroundColor = ConsoleColor.White;
         }
     }
@@ -61,6 +102,8 @@ internal static class Debug
                 return;
             }
 
+            fileWriteQueue?.Add(msg);
+
             Console.ForegroundColor = color;
             Console.WriteLine(msg);
             Console.ForegroundColor = ConsoleColor.White;
@@ -79,9 +122,7 @@ internal static class Debug
 
             for (int i = 0; i < items.Count; i++)
             {
-                Console.ForegroundColor = items[i].color;
-                Console.WriteLine(items[i].message);
-                Console.ForegroundColor = ConsoleColor.White;
+                Debug.Write(items[i].message);
             }
 
             items.Clear();
@@ -128,7 +169,7 @@ internal static class Debug
 #pragma warning disable
     public static void LogStack(ConsoleColor color = ConsoleColor.White)
     {
-#if DEBUG
+//#if DEBUG
         System.Diagnostics.StackTrace stackTrace = new(true);
 
         for (int i = 1; i < stackTrace.FrameCount; i++) // yes i is supposed to start with 1
@@ -141,7 +182,7 @@ internal static class Debug
 
             Log($"{className}.{methodName}:{line}", color);
         }
-#endif
+//#endif
     }
 #pragma warning restore
 

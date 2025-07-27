@@ -27,9 +27,10 @@ internal class SerializedRoomInfo
 
         byte[] tempArray;
 
-        tempArray = Encoding.ASCII.GetBytes(room.owner.nickname ?? "");
-        for (int i = 0; i < ownerNameArray.Length; i++)
-            ownerNameArray[i] = i < tempArray.Length ? tempArray[i] : (byte)0;
+        string tempString = room.owner.nickname;
+        while (tempString.Length < 16) tempString += "\0";
+
+        ownerNameArray = Encoding.ASCII.GetBytes(tempString);
 
         tempArray = Encoding.ASCII.GetBytes(room.name ?? "");
         for (int i = 0; i < roomNameArray.Length; i++)

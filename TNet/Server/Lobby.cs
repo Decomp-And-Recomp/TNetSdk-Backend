@@ -9,6 +9,7 @@ using TNet.Server.Cmd;
 namespace TNet.Server;
 
 public enum LobbyState { NotRunning, Initing, Running}
+public enum Game { tlck, dinoHunter }
 
 internal static class Lobby
 {
@@ -21,9 +22,12 @@ internal static class Lobby
     public readonly static ConcurrentDictionary<ushort, Room> rooms = [];
 
     public static LobbyState state { get; private set; } = LobbyState.NotRunning;
+    public static Game game { get; private set; }
 
-    public static async Task Run(IPAddress address, int port)
+    public static async Task Run(IPAddress address, int port, Game runningFor)
     {
+        game = runningFor;
+
         switch (state)
         {
             case LobbyState.Initing: Debug.LogError("Tried running server while Initing."); return;
@@ -120,8 +124,8 @@ internal static class Lobby
 
             if (read == 0)
             {
-                DisconnectClient(client, DisconnectCode.SocketDisconnect);
-                break;
+                //DisconnectClient(client, DisconnectCode.SocketDisconnect);
+                //break;
             }
             if (read > maxDataLength)
             {

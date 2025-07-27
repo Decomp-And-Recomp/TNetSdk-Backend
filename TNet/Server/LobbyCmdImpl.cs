@@ -16,7 +16,7 @@ internal static class LobbyCmdImpl
         //ushort ping = 0;
         //unPacker.PopUInt16(ref ping); // player is sending the ping, but lets ignore it
 
-        Debug.Log("HEARTBEAT FROM: " + client.id);
+        //Debug.Log("HEARTBEAT FROM: " + client.id);
         client.missedHeartbeatCounter = 0;
 
         await LobbyUtils.SendToClient(SysHeartbeatResCmd.Response(0), client);
@@ -103,7 +103,8 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        client.RemoveFromRoom();
+        if (Lobby.game == Game.dinoHunter) Lobby.DisconnectClient(client, DisconnectCode.RoomLeave);
+        else client.RemoveFromRoom();
     }
 
     public static void OnRoomKick(UnPacker unPacker, Client client)

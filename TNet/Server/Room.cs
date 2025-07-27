@@ -91,12 +91,19 @@ internal class Room : IDisposable
             return;
         }
 
-        await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, id), owner);
+        try
+        {
+            await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, id), owner);
 
-        // TLCK ONLY
-        _ = TryConnectClient(owner, password);
-        // else
-        //clients.Add(owner);
+            // TLCK ONLY
+            await TryConnectClient(owner, password);
+            // else
+            //clients.Add(owner);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
     }
 
     /*public void SendToId(ushort id, params Packet[] packets)
@@ -147,7 +154,7 @@ internal class Room : IDisposable
         {
             if (excludeClients.Contains(clients[i])) continue;
 
-            tasks[i] = LobbyUtils.SendToClient(packet, clients[i]);
+            tasks.Add(LobbyUtils.SendToClient(packet, clients[i]));
         }
 
         await Task.WhenAll(tasks);
@@ -166,6 +173,8 @@ internal class Room : IDisposable
             Debug.LogError("Client is already connected to the room.");
             return;
         }
+
+        Debug.LogInfo("Connecting player");
 
         // Password check is disabled for now
         /*
@@ -227,6 +236,8 @@ internal class Room : IDisposable
 #nullable enable
             });
         }
+
+        Debug.LogInfo("Connecting player end");
     }
 
     public void ShutDown()
