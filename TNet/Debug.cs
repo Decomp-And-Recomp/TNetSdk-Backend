@@ -31,7 +31,7 @@ internal static class Debug
         string path = Path.Combine("Logs", DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss") + ".txt");
         File.Create(path).Close();
 
-        Log("Started saving logs in: " + Path.Combine(Directory.GetCurrentDirectory(), path));
+        Write("Started saving logs in: " + Path.Combine(Directory.GetCurrentDirectory(), path));
 
         List<string> toWrite = [];
 
