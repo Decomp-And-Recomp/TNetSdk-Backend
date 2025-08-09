@@ -27,7 +27,7 @@ internal class LobbyUtils
         return (ushort)((data[pos] << 8) | data[pos + 1]);
     }
 
-    public static void Decrypt(Packet packet)
+    /*public static void Decrypt(Packet packet)
     {
         if (Lobby.blowFish == null) return;
 
@@ -98,7 +98,7 @@ internal class LobbyUtils
         data[5] = (byte)(((num2 & 0xFF0000) >> 16) & 0xFFu);
         data[6] = (byte)(((num2 & 0xFF00) >> 8) & 0xFFu);
         data[7] = (byte)(num2 & 0xFFu & 0xFFu);
-    }
+    }*/
 
     /*
             uint num = (uint)((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
@@ -142,7 +142,7 @@ internal class LobbyUtils
     {
         if (client.disconnected || !client.connection.Connected) return;
 
-        Encrypt(packet);
+        //Encrypt(packet);
 
         byte[] bytes = new byte[packet.Length];
 

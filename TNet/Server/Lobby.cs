@@ -15,7 +15,6 @@ internal static class Lobby
 {
     const int maxDataLength = 4096;
 
-    public static BlowFish? blowFish;
     static TcpListener? listener;
 
     public readonly static ConcurrentDictionary<ushort, Client> clients = [];
@@ -172,7 +171,7 @@ internal static class Lobby
     {
         byte[] bytes = data.Take(8).ToArray();
 
-        LobbyUtils.Decrypt(ref bytes);
+        //LobbyUtils.Decrypt(ref bytes);
 
         return LobbyUtils.WatchUInt16(bytes, 0);
     }
@@ -183,7 +182,7 @@ internal static class Lobby
         
         Packet p = new(bytes, bytes.Length, false);
 
-        LobbyUtils.Decrypt(p);
+        //LobbyUtils.Decrypt(p);
 
         if (!unPacker.ParserPacket(p))
         {
