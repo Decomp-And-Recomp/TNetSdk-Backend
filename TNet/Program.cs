@@ -14,17 +14,11 @@ internal class Program
         if (!Init(args, out int port, out int game))
         {
             Debug.Write("Press any key to close..");
-            Console.ReadKey(false);
+            Console.ReadKey(true);
             return;
         }
 
         Game gameParse = (Game)game;
-
-        if (gameParse > Game.DinoHunter)
-        {
-            Debug.Write($"Unsupported game id:{game}");
-            return;
-        }
 
         Console.WriteLine("TNet Backend, made by overmet15.");
 
@@ -47,6 +41,13 @@ internal class Program
         game = 0;
         port = 0;
 
+        if (args.Length == 0)
+        {
+            Debug.Write("Usage: TNet -g {gameId} -p {port}");
+            LogGames();
+            return false;
+        }
+
         for (int i = 0; i < args.Length; i++)
         {
             if (args[i] == "-p")
@@ -64,11 +65,14 @@ internal class Program
                 else
                 {
                     Debug.Write("Game (-g) cannot be parsed as int, make sure its only numbers.", ConsoleColor.Red);
-                    Debug.Write("Aviable games: ");
-                    foreach (Game g in Enum.GetValues(typeof(Game)))
-                    {
-                        Debug.Write($"{g}: {(int)g}");
-                    }
+                    LogGames();
+                    return false;
+                }
+
+                if (game > 1 || game < 0)
+                {
+                    Debug.Write($"Unsupported game id:{game}");
+                    LogGames();
                     return false;
                 }
             }
@@ -82,6 +86,7 @@ internal class Program
         else if (!gameSet)
         { 
             Debug.Write("Game (-g {gameId}) is not set. Make sure that the game is set", ConsoleColor.Red);
+            return false;
         }
         else if (!portSet)
         {
@@ -90,6 +95,15 @@ internal class Program
         }
 
         return true;
+    }
+
+    static void LogGames()
+    {
+        Debug.Write("Aviable games ids:");
+        foreach (Game g in Enum.GetValues(typeof(Game)))
+        {
+            Debug.Write($"{g}: {(int)g}");
+        }
     }
 
     static void OnTaskException(object? sender, UnobservedTaskExceptionEventArgs args)
