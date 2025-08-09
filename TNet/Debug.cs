@@ -61,9 +61,9 @@ internal static class Debug
 
             var time = DateTime.UtcNow;
 
-            if (string.IsNullOrEmpty(msg))
+            if (msg == null)
             {
-                LogWarning("[The message was empty.]");
+                LogWarning("[The message was null.]");
                 return;
             }
 
