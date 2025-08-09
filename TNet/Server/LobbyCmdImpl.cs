@@ -208,7 +208,7 @@ internal static class LobbyCmdImpl
 
         if (client.room == null)
         {
-            //Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
+            Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
             return;
         }
 
