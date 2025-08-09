@@ -176,7 +176,7 @@ internal class Room : IDisposable
 
         Debug.LogInfo("Connecting player");
 
-        // Password check is disabled for now
+        // Password check is not implemented on client side.
         /*
         if (!string.IsNullOrWhiteSpace(this.password))
         {
@@ -223,21 +223,25 @@ internal class Room : IDisposable
 
         Debug.LogInfo("Client connected, count: " + clients.Count);
 
-        if (!isStarting && clients.Count > 1 && state == State.open)
+        if (Lobby.game == Game.Tlck)
         {
-            isStarting = true;
-
-            _ = Task.Run(async () =>
+            if (!isStarting && clients.Count > 1 && state == State.open)
             {
-                await Task.Delay(12000);
+                isStarting = true;
+
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(12000);
 #nullable disable
-                if (state == State.open && clients.Count > 1) Start(owner);
-                else isStarting = false;
+                    if (state == State.open && clients.Count > 1) Start(owner);
+                    else isStarting = false;
 #nullable enable
-            });
+                });
+            }
+
         }
 
-        Debug.LogInfo("Connecting player end");
+        Debug.LogInfo($"Connected client:{client.id} to room:{id}");
     }
 
     public void ShutDown()
