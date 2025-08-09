@@ -59,7 +59,7 @@ internal static class AdminPanel
                 if (string.IsNullOrWhiteSpace(line))
                 {
                     isTyping = false;
-                    return;
+                    continue;
                 }
 
                 string[] parammsRaw = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -67,7 +67,7 @@ internal static class AdminPanel
                 if (parammsRaw.Length == 0)
                 {
                     isTyping = false;
-                    return;
+                    continue;
                 }
 
                 string command = parammsRaw[0];
