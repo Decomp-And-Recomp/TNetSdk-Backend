@@ -11,7 +11,13 @@ internal class Program
         Console.InputEncoding = Encoding.UTF8;
         Console.OutputEncoding = Encoding.UTF8;
 
-        if (!Init(args, out int port, out int game)) return;
+        if (!Init(args, out int port, out int game))
+        {
+            Debug.Write("Press any key to close..");
+            Console.ReadKey(false);
+            return;
+        }
+
         Game gameParse = (Game)game;
 
         if (gameParse > Game.DinoHunter)
