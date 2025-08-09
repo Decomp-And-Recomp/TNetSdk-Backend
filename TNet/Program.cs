@@ -8,23 +8,76 @@ internal class Program
 {
     static async Task Main(string[] args)
     {
-        // basic console initing
         Console.InputEncoding = Encoding.UTF8;
         Console.OutputEncoding = Encoding.UTF8;
 
-        TaskScheduler.UnobservedTaskException += OnTaskException;
+        if (!Init(args, out int port, out int game)) return;
+        Game gameParse = (Game)game;
 
         Console.WriteLine("TNet Backend, made by overmet15.");
 
-        InitEncryption(args);
+        Debug.Write("\n");
+
+        Debug.Write($"Port set to {port}");
+        Debug.Write($"Game set to {gameParse}");
+
+        TaskScheduler.UnobservedTaskException += OnTaskException;
 
         _ = Debug.StartFileWriting();
 
-#if DEBUG
-        await Lobby.Run(IPAddress.Any, InitPort(args), Game.dinoHunter);
-#else
-        await Lobby.Run(IPAddress.Any, InitPort(args), Game.dinoHunter); // make game a argument on app launch
-#endif
+        await Lobby.Run(IPAddress.Any, port, gameParse);
+    }
+
+    static bool Init(string[] args, out int port, out int game)
+    {
+        bool gameSet = false;
+        bool portSet = false;
+        game = 0;
+        port = 0;
+
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (args[i] == "-p")
+            {
+                if (int.TryParse(args[i+1], out port)) portSet = true;
+                else
+                {
+                    Debug.Write("Port (-p) cannot be parsed as int, make sure its only numbers.", ConsoleColor.Red);
+                    return false;
+                }
+            }
+            if (args[i] == "-g")
+            {
+                if (int.TryParse(args[i + 1], out game)) gameSet = true;
+                else
+                {
+                    Debug.Write("Game (-g) cannot be parsed as int, make sure its only numbers.", ConsoleColor.Red);
+                    Debug.Write("Aviable games: ");
+                    foreach (Game g in Enum.GetValues(typeof(Game)))
+                    {
+                        Debug.Write($"{g}: {(int)g}");
+                    }
+                    return false;
+                }
+            }
+        }
+
+        if (!gameSet && !portSet)
+        {
+            Debug.Write("Game and Port (-g {gameId} -p {port}) were not set. Make sure that atleast the game is set", ConsoleColor.Red);
+            return false;
+        }
+        else if (!gameSet)
+        { 
+            Debug.Write("Game (-g {gameId}) is not set. Make sure that the game is set", ConsoleColor.Red);
+        }
+        else if (!portSet)
+        {
+            Debug.Write("Port (-p {port}) is not set. Defaulting to 6750");
+            port = 6750;
+        }
+
+        return true;
     }
 
     static void OnTaskException(object? sender, UnobservedTaskExceptionEventArgs args)
@@ -36,51 +89,5 @@ internal class Program
         }
 
         args.SetObserved();
-    }
-
-    static int InitPort(string[] args)
-    {
-#if DEBUG
-        return 6750;
-#else
-        int parse;
-
-        if (args.Length > 0)
-        {
-            if (int.TryParse(args[0], out parse)) return parse;
-        }
-
-        Console.WriteLine("Input port...");
-
-        while (true)
-        {
-            if (int.TryParse(Console.ReadLine(), out parse)) break;
-            else Console.WriteLine("Try again...");
-        }
-
-        return parse;
-#endif
-    }
-
-    static void InitEncryption(string[] args)
-    {
-#if DEBUG
-        //Lobby.blowFish = new("Triniti_Tlck");
-#else
-        if (args.Length > 1)
-        {
-            if (!string.IsNullOrWhiteSpace(args[1]))
-            {
-                Lobby.blowFish = new(args[1]);
-                return;
-            }
-        }
-
-        Console.WriteLine("Input the encryption key...");
-        string? key = Console.ReadLine();
-
-        if (string.IsNullOrWhiteSpace(key)) Console.WriteLine("No key provided, no encryption will be used.");
-        else Lobby.blowFish = new(key);
-#endif
     }
 }

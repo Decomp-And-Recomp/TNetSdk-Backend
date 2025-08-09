@@ -14,7 +14,7 @@ internal static class LobbyCmdImpl
     public static async Task OnSystemHeartbeat(Client client)
     {
         //ushort ping = 0;
-        //unPacker.PopUInt16(ref ping); // player is sending the ping, but lets ignore it
+        //unPacker.PopUInt16(ref ping); // player is sending the ping TLCK, but others dont
 
         //Debug.Log("HEARTBEAT FROM: " + client.id);
         client.missedHeartbeatCounter = 0;
@@ -103,7 +103,7 @@ internal static class LobbyCmdImpl
             return;
         }
 
-        if (Lobby.game == Game.dinoHunter) Lobby.DisconnectClient(client, DisconnectCode.RoomLeave);
+        if (Lobby.game == Game.DinoHunter) Lobby.DisconnectClient(client, DisconnectCode.RoomLeave);
         else client.RemoveFromRoom();
     }
 
@@ -208,7 +208,7 @@ internal static class LobbyCmdImpl
 
         if (client.room == null)
         {
-            Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
+            //Lobby.DisconnectClient(client, DisconnectCode.SuspiciousRequests);
             return;
         }
 
@@ -241,7 +241,5 @@ internal static class LobbyCmdImpl
         }
 
         client.room.Start(client);
-
-        //client.room.SendToAll(RoomMsgNotifyCmd.Notify(client.id, cmd.bytes));
     }
 }

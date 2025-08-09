@@ -9,7 +9,7 @@ using TNet.Server.Cmd;
 namespace TNet.Server;
 
 public enum LobbyState { NotRunning, Initing, Running}
-public enum Game { tlck, dinoHunter }
+public enum Game { Tlck, DinoHunter }
 
 internal static class Lobby
 {
