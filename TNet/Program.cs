@@ -14,6 +14,12 @@ internal class Program
         if (!Init(args, out int port, out int game)) return;
         Game gameParse = (Game)game;
 
+        if (gameParse > Game.DinoHunter)
+        {
+            Debug.Write($"Unsupported game id:{game}");
+            return;
+        }
+
         Console.WriteLine("TNet Backend, made by overmet15.");
 
         Debug.Write("\n");
