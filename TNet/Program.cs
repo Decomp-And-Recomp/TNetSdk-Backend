@@ -11,7 +11,7 @@ internal class Program
         Console.InputEncoding = Encoding.UTF8;
         Console.OutputEncoding = Encoding.UTF8;
 
-        if (!Init(args, out int port, out int game))
+        if (!Init(args, out int port, out int game, out bool saveLogs))
         {
             Debug.Write("Press any key to close..");
             Console.ReadKey(true);
@@ -29,17 +29,18 @@ internal class Program
 
         TaskScheduler.UnobservedTaskException += OnTaskException;
 
-        _ = Debug.StartFileWriting();
+        if (saveLogs) _ = Debug.StartFileWriting();
 
         await Lobby.Run(IPAddress.Any, port, gameParse);
     }
 
-    static bool Init(string[] args, out int port, out int game)
+    static bool Init(string[] args, out int port, out int game, out bool saveLogs)
     {
         bool gameSet = false;
         bool portSet = false;
         game = 0;
         port = 0;
+        saveLogs = false;
 
         if (args.Length == 0)
         {
@@ -76,6 +77,7 @@ internal class Program
                     return false;
                 }
             }
+            if (args[i] == "-sl") saveLogs = true;
         }
 
         if (!gameSet && !portSet)

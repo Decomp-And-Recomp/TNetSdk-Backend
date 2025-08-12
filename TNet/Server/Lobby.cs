@@ -199,9 +199,8 @@ internal static class Lobby
             return;
         }
 
-#if DEBUG
-        Debug.Log($"Protocol-{unPacker.GetProtocol()} Cmd-{unPacker.GetCmd()}", ConsoleColor.Cyan);
-#endif
+        //Debug.Log($"Protocol-{unPacker.GetProtocol()} Cmd-{unPacker.GetCmd()}", ConsoleColor.Cyan);
+
         if (unPacker.GetProtocol() == 1)
         {
             SysCMD sysCommand = (SysCMD)unPacker.GetCmd();
