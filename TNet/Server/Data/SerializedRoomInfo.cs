@@ -20,25 +20,22 @@ internal class SerializedRoomInfo
 
     public static SerializedRoomInfo FromRoom(Room room)
     {
+        string InitString(string s, int length)
+        {
+            while (s.Length < length) s += "\0";
+            return s;
+        }
+
         if (room.owner == null)
             throw new MissingRoomOwnerException();
 
-        byte[] ownerNameArray = new byte[16], roomNameArray = new byte[16], roomCommentArray = new byte[64];
+        byte[] nameArray = Encoding.ASCII.GetBytes(InitString(room.owner.nickname, 16));
+        byte[] roomNameArray = Encoding.ASCII.GetBytes(InitString(room.owner.nickname, 16));
+        byte[] roomCommentArray = Encoding.ASCII.GetBytes(InitString(room.comment, 64));
 
-        byte[] tempArray;
-
-        string tempString = room.owner.nickname;
-        while (tempString.Length < 16) tempString += "\0";
-
-        ownerNameArray = Encoding.ASCII.GetBytes(tempString);
-
-        tempArray = Encoding.ASCII.GetBytes(room.name ?? "");
-        for (int i = 0; i < roomNameArray.Length; i++)
-            roomNameArray[i] = i < tempArray.Length ? tempArray[i] : (byte)0;
-
-        tempArray = Encoding.ASCII.GetBytes(room.comment ?? "");
-        for (int i = 0; i < roomCommentArray.Length; i++)
-            roomCommentArray[i] = i < tempArray.Length ? tempArray[i] : (byte)0;
+        nameArray[15] = 0;
+        roomNameArray[15] = 0;
+        roomCommentArray[63] = 0;
 
         return new()
         {
@@ -49,7 +46,7 @@ internal class SerializedRoomInfo
             maxUsers = room.maxUsers,
             state = room.state == Room.State.started ? (ushort)1 : (ushort)0,
             passworded = string.IsNullOrWhiteSpace(room.password) ? (ushort)0 : (ushort)1,
-            creatorName = ownerNameArray,
+            creatorName = nameArray,
             roomName = roomNameArray,
             roomComment = roomCommentArray
         };
