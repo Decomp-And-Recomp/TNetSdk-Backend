@@ -12,5 +12,6 @@ internal enum DisconnectCode
     SocketDisconnect,
     TooShortData,
     RoomKick,
-    ReadException
+    ReadException,
+    WriteException
 }

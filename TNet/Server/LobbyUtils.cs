@@ -156,6 +156,7 @@ internal class LobbyUtils
         catch (Exception ex)
         {
             Debug.LogException("Send failed: ", ex);
+            Lobby.DisconnectClient(client, DisconnectCode.WriteException);
         }
     }
 }

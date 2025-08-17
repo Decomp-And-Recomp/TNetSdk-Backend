@@ -6,8 +6,8 @@ internal static class AdminCommands
 {
     public static void SetUp()
     {
-        AdminPanel.RegisterCommand("GCC", (s) => { System.GC.Collect(); }, "Calls System.GC.Collect().");
-        AdminPanel.RegisterCommand("client-list", ClientList, "Lists all clients.");
+        AdminPanel.RegisterCommand("GCC", (s) => { GC.Collect(); }, "Calls System.GC.Collect().");
+        AdminPanel.RegisterCommand("client-list", ClientList, "Lists all clients. -i to reveal IPs");
         AdminPanel.RegisterCommand("client-disconnect", ClientDisconnect, "Disconnects a client(s), Put id(s) after command.");
         AdminPanel.RegisterCommand("room-list", RoomList, "Lists all rooms.");
         AdminPanel.RegisterCommand("room-start", RoomStart, "Starts a room(s). Put id(s) after command.");
@@ -16,11 +16,21 @@ internal static class AdminCommands
 
     static void ClientList(string[] arguments)
     {
-        Debug.Write("id|room id|disconnected|heartbeat counter|nick");
+        Debug.Write("id|room id|disconnected|heartbeat counter|nick|IP");
+        if (arguments.Contains("-i"))
+        {
+            foreach (Client c in Lobby.clients.Values)
+            {
+                if (c.room != null) Debug.Write($"{c.id}|{c.room.id}|{c.disconnected}|{c.missedHeartbeatCounter}|\"{c.nickname}\"|{c.ipAddress}");
+                else Debug.Write($"{c.id}|N/A|{c.disconnected}|{c.missedHeartbeatCounter}|\"{c.nickname}\"|{c.ipAddress}");
+            }
+            return;
+        }
+
         foreach (Client c in Lobby.clients.Values)
         {
-            if (c.room != null) Debug.Write($"{c.id}|{c.room.id}|{c.disconnected}|{c.missedHeartbeatCounter}|\"{c.nickname}\"");
-            else Debug.Write($"{c.id}|N/A|{c.disconnected}|{c.missedHeartbeatCounter}|\"{c.nickname}\"");
+            if (c.room != null) Debug.Write($"{c.id}|{c.room.id}|{c.disconnected}|{c.missedHeartbeatCounter}|\"{c.nickname}\"|X");
+            else Debug.Write($"{c.id}|N/A|{c.disconnected}|{c.missedHeartbeatCounter}|\"{c.nickname}\"|X");
         }
     }
 

@@ -1,15 +1,12 @@
 ﻿using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
-using TNet.Encryption;
 using TNet.Server.Binary;
 using TNet.Server.Binary.Protocol;
-using TNet.Server.Cmd;
 
 namespace TNet.Server;
 
 public enum LobbyState { NotRunning, Initing, Running}
-public enum Game { Tlck, DinoHunter }
 
 internal static class Lobby
 {
@@ -76,6 +73,20 @@ internal static class Lobby
 
     static async Task HandleConnection(TcpClient tcpClient)
     {
+        if (tcpClient.Client.RemoteEndPoint == null)
+        {
+            Debug.Log("tcpClient.Client.RemoteEndPoint == null");
+            tcpClient.Close();
+            return;
+        }
+
+        if (BanList.IsBanned(((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString()))
+        {
+            Debug.Log("Blocked banned ip");
+            tcpClient.Close();
+            return;
+        }
+        
         Client client = new(tcpClient);
 
         bool added = false;
@@ -123,8 +134,8 @@ internal static class Lobby
 
             if (read == 0)
             {
-                //DisconnectClient(client, DisconnectCode.SocketDisconnect);
-                //break;
+                DisconnectClient(client, DisconnectCode.SocketDisconnect);
+                break;
             }
             if (read > maxDataLength)
             {
@@ -236,28 +247,6 @@ internal static class Lobby
         LobbyUtils.LogUnimpl(command);
     }
 
-    /*internal enum TNetEventRoom
-    {
-        GET_ROOM_LIST = 2,
-        ROOM_REMOVE = 7,
-        ROOM_CREATION = 4,
-        ROOM_JOIN = 9,
-        USER_ENTER_ROOM = 10,
-        USER_EXIT_ROOM = 12,
-        USER_BE_KICKED = 14,
-        OBJECT_MESSAGE = 25,
-        ROOM_VARIABLES_UPDATE = 18,
-        USER_VARIABLES_UPDATE = 20,
-        USER_STATE = 22,
-        ROOM_NAME_CHANGE = 16,
-        LOCK_STH = 27,
-        UNLOCK_STH = 29,
-        ROOM_START = 31,
-        ROOM_MASTER_CHANGE = 32,
-        ROOM_REMOVE_RES = 6,
-        ROOM_COMMENT_CHANGE = 34
-    }*/
-
     public static void DisconnectClient(Client client, DisconnectCode code)
     {
         if (client.disconnected) return;
@@ -266,7 +255,7 @@ internal static class Lobby
         if (code == DisconnectCode.SuspiciousRequests)
         {
             Debug.LogStack(ConsoleColor.DarkMagenta);
-            return; // Off for testing..
+            return; // Off for testing.. -- its never have been on since
         }
         client.Disconnect();
     }

@@ -129,13 +129,7 @@ internal static class Debug
         }
     }
 
-    ///<summary>Logs a 'DEBUG' BUILD ONLY log</summary>
-    public static void LogInfo(object msg, ConsoleColor color = ConsoleColor.Cyan)
-    {
-#if DEBUG
-        Log(msg, color);
-#endif
-    }
+    public static void LogInfo(object msg, ConsoleColor color = ConsoleColor.Cyan) => Log(msg, color);
 
     ///<summary>Logs message and stack trace</summary>
     public static void LogWarning(object msg)

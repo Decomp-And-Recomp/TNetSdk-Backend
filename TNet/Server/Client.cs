@@ -1,10 +1,13 @@
-﻿using System.Net.Sockets;
+﻿using System.Net;
+using System.Net.Sockets;
 using TNet.Server.Notifications;
 
 namespace TNet.Server;
 
 internal class Client : IDisposable
 {
+    public readonly string ipAddress;
+
     public readonly TcpClient connection;
     public Room? room;
 
@@ -22,6 +25,7 @@ internal class Client : IDisposable
     public Client(TcpClient client)
     {
         connection = client;
+        ipAddress = ((IPEndPoint)client.Client.RemoteEndPoint!).Address.ToString();
 
         _ = Loop();
     }
@@ -32,14 +36,14 @@ internal class Client : IDisposable
         {
             missedHeartbeatCounter++;
 
-            if (missedHeartbeatCounter > 30 || !connection.Connected)
+            if (missedHeartbeatCounter > 15 || !connection.Connected)
             {
                 Debug.Log("Client havent sent anything in a while, removing..");
                 Disconnect();
                 break;
             }
 
-            await Task.Delay(2000);
+            await Task.Delay(3000);
         }
     }
 

@@ -31,6 +31,8 @@ internal class Program
 
         if (saveLogs) _ = Debug.StartFileWriting();
 
+        await BanList.Initialize();
+
         await Lobby.Run(IPAddress.Any, port, gameParse);
     }
 
@@ -80,19 +82,14 @@ internal class Program
             if (args[i] == "-sl") saveLogs = true;
         }
 
-        if (!gameSet && !portSet)
-        {
-            Debug.Write("Game and Port (-g {gameId} -p {port}) were not set. Make sure that atleast the game is set", ConsoleColor.Red);
-            return false;
-        }
-        else if (!gameSet)
+        if (!gameSet)
         { 
-            Debug.Write("Game (-g {gameId}) is not set. Make sure that the game is set", ConsoleColor.Red);
-            return false;
+            Debug.Write("Game (-g {gameId}) is not set. Defaulting to Default", ConsoleColor.Magenta);
+            game = 0;
         }
-        else if (!portSet)
+        if (!portSet)
         {
-            Debug.Write("Port (-p {port}) is not set. Defaulting to 6750");
+            Debug.Write("Port (-p {port}) is not set. Defaulting to 6750", ConsoleColor.Magenta);
             port = 6750;
         }
 

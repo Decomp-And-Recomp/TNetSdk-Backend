@@ -96,7 +96,7 @@ internal class Room : IDisposable
             await LobbyUtils.SendToClient(RoomCreateResCmd.Response(RoomCreateResCmd.Result.ok, id), owner);
 
             // TLCK ONLY
-            await TryConnectClient(owner, password);
+            if (Lobby.game != Game.DinoHunter) await TryConnectClient(owner, password);
             // else
             //clients.Add(owner);
         }
