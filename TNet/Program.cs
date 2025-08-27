@@ -72,7 +72,7 @@ internal class Program
                     return false;
                 }
 
-                if (game > 1 || game < 0)
+                if (game < 0 || game >= Enum.GetValues(typeof(Game)).Length)
                 {
                     Debug.Write($"Unsupported game id:{game}");
                     LogGames();
