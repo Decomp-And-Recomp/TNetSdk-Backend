@@ -8,8 +8,6 @@ internal static class Debug
         public readonly ConsoleColor color = color;
     }
 
-    static int paused;
-
     static readonly object logLock = new();
 
     static readonly List<Item> items = [];
@@ -96,7 +94,7 @@ internal static class Debug
                 return;
             }
 
-            if (AdminPanel.isTyping || paused > 0)
+            if (AdminPanel.isTyping)
             {
                 items.Add(new(message, color));
                 return;
@@ -118,7 +116,7 @@ internal static class Debug
     {
         lock (logLock)
         {
-            if (AdminPanel.isTyping || paused > 0) return;
+            if (AdminPanel.isTyping) return;
 
             for (int i = 0; i < items.Count; i++)
             {
@@ -179,16 +177,4 @@ internal static class Debug
 //#endif
     }
 #pragma warning restore
-
-    public static void Pause()
-    {
-#if DEBUG
-        paused++;
-        Log("Press any key to continue..", ConsoleColor.DarkCyan);
-        Console.ReadKey(false);
-        paused--;
-
-        Free();
-#endif
-    }
 }
