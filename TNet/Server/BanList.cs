@@ -27,7 +27,7 @@ internal static class BanList
         {
             if (string.IsNullOrWhiteSpace(s) || s.TrimStart().StartsWith('#')) continue;
 
-            list.Add(s);
+            list.Add(s.Trim());
         }
     }
 
