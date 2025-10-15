@@ -1,0 +1,8 @@
+﻿[*.cs]
+
+# IDE0290: Использовать основной конструктор
+csharp_style_prefer_primary_constructors = false
+csharp_style_namespace_declarations = file_scoped:suggestion
+
+dotnet_diagnostic.CA2211.severity = none
+dotnet_diagnostic.IDE1006.severity = none
