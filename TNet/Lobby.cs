@@ -16,8 +16,8 @@ internal static class Lobby
     public static readonly BlowFish blowFish = new("ExampleKey");
     public static Version version;
 
-    static ConcurrentDictionary<ushort, Client> clients = [];
-    //static Dictionary<ushort, Client> rooms = [];
+    public static ConcurrentDictionary<ushort, Client> clients = [];
+    public static ConcurrentDictionary<ushort, Room> rooms = [];
 
     static readonly ProtocolHandler[] handlers = {
         new DummyProtocolHandler(),
@@ -46,23 +46,9 @@ internal static class Lobby
 
     static async Task HandleClient(TcpClient tcpClient)
     {
-        ushort id;
-        Client client;
+        Client client = new(tcpClient);
 
-        while (true)
-        {
-            id = RandomHelper.GetClientId();
-
-            if (clients.ContainsKey(id)) continue;
-
-            client = new(tcpClient, id);
-
-            if (!clients.TryAdd(id, client)) continue;
-
-            break;
-        }
-
-        Logger.Info($"New client connected, id: {id}");
+        Logger.Info($"New client connected.");
 
         byte[] buffer = new byte[maxPacketLength];
         List<byte> received = [];

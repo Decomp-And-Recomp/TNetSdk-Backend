@@ -68,12 +68,14 @@ internal class BufferWriter
         data.AddRange(bytes);
     }
 
-    public void PushString(string str, int padding)
+    public void PushString(string str, int padding, bool nullByteAtEnd = true)
     {
         byte[] bytes = Encoding.ASCII.GetBytes(str);
         byte[] post = new byte[padding];
 
         Array.Copy(bytes, post, bytes.Length > 16 ? 16 : bytes.Length);
+
+        if (nullByteAtEnd) post[padding - 1] = 0;
 
         data.AddRange(post);
     }

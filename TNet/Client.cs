@@ -9,18 +9,18 @@ internal class Client
     public readonly NetworkStream stream;
     public bool disconnected { get; private set; }
 
-    public readonly ushort id;
+    public bool loggedIn;
+
+    public ushort id;
 
     public string nickname = string.Empty;
 
     public int missedHeartbeats;
 
-    public Client(TcpClient client, ushort id)
+    public Client(TcpClient client)
     {
         this.client = client;
         stream = client.GetStream();
-
-        this.id = id;
 
         _ = HeartbeatLoop();
     }

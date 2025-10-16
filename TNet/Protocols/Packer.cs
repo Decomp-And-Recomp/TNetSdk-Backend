@@ -39,7 +39,7 @@ internal class Packer : BufferWriter
         w.PushUInt16(compressType);
         w.PushByteArray(data);
 
-        Logger.Info($"New packet: {(Protocol)protocol}:{cmd}");
+        Logger.Log($"New packet: {(Protocol)protocol}:{cmd}");
 
         return w.ToByteArray();
     }

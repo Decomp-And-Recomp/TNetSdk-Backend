@@ -9,6 +9,8 @@ internal class RoomProtocolHandler : ProtocolHandler
 {
     public override void Handle(XClient client, UnPacker unPacker)
     {
+        if (!client.loggedIn) return;
+
         switch ((Cmd)unPacker.cmd)
         {
             case Cmd.Create:

@@ -1,4 +1,5 @@
-﻿using TNet.Protocols.Common.Client;
+﻿using TNet.Helpers;
+using TNet.Protocols.Common.Client;
 using TNet.Protocols.Common.Server;
 using XClient = TNet.Client;
 
@@ -52,16 +53,34 @@ internal class CommonProtocolHandler : ProtocolHandler
             return;
         }
 
-        LoginCmdRes response = new()
+        LoginCmdRes response = new();
+
+        if (Lobby.clients.Count >= Variables.maxClients)
         {
-            result = LoginCmdRes.Result.Ok,
-            userId = client.id,
-            nickname = cmd.nickname
-        };
+            response.result = LoginCmdRes.Result.Error_Password; // there isnt anything else i can use
+        }
+        else
+        {
+            ushort id;
 
-        client.nickname = cmd.nickname;
+            while (true)
+            {
+                id = RandomHelper.GetClientId();
 
-        Logger.Info($"Client '{client.id}' idenefied as '{client.nickname}'.");
+                if (Lobby.clients.ContainsKey(id)) continue;
+
+                if (!Lobby.clients.TryAdd(id, client)) continue;
+
+                break;
+            }
+
+            Logger.Info($"Client '{client.id}' idenefied as '{client.nickname}'.");
+
+            client.loggedIn = true;
+            client.nickname = cmd.nickname;
+            response.userId = client.id;
+            response.nickname = cmd.nickname;
+        }
 
         _ = client.Send(response.Pack());
 
