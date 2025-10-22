@@ -1,19 +1,10 @@
 ﻿using TNet.Protocols.Objects;
 
-namespace TNet.Protocols.Room.Server;
+namespace TNet.Protocols.RoomProtocol.ServerPackets;
 
 internal class RoomJoinResCmd : IServerPacket
 {
-    public enum Result : ushort
-    {
-        Ok = 0,
-        Full = 1,
-        DoesntExist = 2,
-        AlreadyStarted = 3,
-        PasswordMismatch = 4
-    }
-
-    public Result result;
+    public RoomJoinResult result;
     public ushort index;
     public RoomInfo roomInfo = new();
 

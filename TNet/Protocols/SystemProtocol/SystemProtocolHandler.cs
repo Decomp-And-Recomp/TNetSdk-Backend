@@ -1,13 +1,12 @@
 ﻿using TNet.Helpers;
-using TNet.Protocols.Common.Client;
-using TNet.Protocols.Common.Server;
-using XClient = TNet.Client;
+using TNet.Protocols.SystemProtocol.ClientPackets;
+using TNet.Protocols.SystemProtocol.ServerPackets;
 
-namespace TNet.Protocols.Common;
+namespace TNet.Protocols.SystemProtocol;
 
-internal class CommonProtocolHandler : ProtocolHandler
+internal class SystemProtocolHandler : ProtocolHandler
 {
-    public override void Handle(XClient client, UnPacker unPacker)
+    public override void Handle(Client client, UnPacker unPacker)
     {
         switch ((Cmd)unPacker.cmd)
         {
@@ -18,40 +17,31 @@ internal class CommonProtocolHandler : ProtocolHandler
                 OnLogin(client, unPacker);
                 return;
             default:
-                Logger.Error($"Cannot handle Common cmd '{(Cmd)unPacker.cmd}'");
-                return;
+                throw new Exception($"Cannot handle System cmd '{(Cmd)unPacker.cmd}'");
         }
     }
 
-    static void OnHeartbeat(XClient client, UnPacker unPacker)
+    static void OnHeartbeat(Client client, UnPacker unPacker)
     {
         HeartbeatCmd cmd = new();
 
-        if (!cmd.Parse(unPacker))
-        {
-            Logger.Error("Unable to parse 'HeartbeatCmd'.");
-            return;
-        }
+        if (!cmd.Parse(unPacker)) throw new Exception("Unable to parse 'HeartbeatCmd'.");
 
         HeartbeatCmdRes response = new()
         {
-            m_server_time = 0
+            m_server_time = (long)(DateTime.UtcNow - client.connectTime).TotalMilliseconds
         };
 
-        client.missedHeartbeats = 0;
+        client.heartValue = 0;
 
         _ = client.Send(response.Pack());
     }
 
-    static void OnLogin(XClient client, UnPacker unPacker)
+    static void OnLogin(Client client, UnPacker unPacker)
     {
         LoginCmd cmd = new();
 
-        if (!cmd.Parse(unPacker))
-        {
-            Logger.Error("Unable to parse 'LoginCmd'.");
-            return;
-        }
+        if (!cmd.Parse(unPacker)) throw new Exception("Unable to parse 'LoginCmd'.");
 
         LoginCmdRes response = new();
 

@@ -1,4 +1,4 @@
-﻿namespace TNet.Protocols.Common.Client;
+﻿namespace TNet.Protocols.SystemProtocol.ClientPackets;
 
 internal class HeartbeatCmd : IClientPacket
 {

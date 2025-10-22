@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Collections.Concurrent;
+using System.Net.Sockets;
 using TNet.Helpers;
 
 namespace TNet;
@@ -7,6 +8,9 @@ internal class Client
 {
     public readonly TcpClient client;
     public readonly NetworkStream stream;
+
+    public readonly DateTime connectTime;
+
     public bool disconnected { get; private set; }
 
     public bool loggedIn;
@@ -15,12 +19,18 @@ internal class Client
 
     public string nickname = string.Empty;
 
-    public int missedHeartbeats;
+    public Room? room;
+
+    public float heartValue;
+
+    public readonly ConcurrentDictionary<ushort, byte[]> userVariables = [];
 
     public Client(TcpClient client)
     {
         this.client = client;
         stream = client.GetStream();
+
+        connectTime = DateTime.UtcNow;
 
         _ = HeartbeatLoop();
     }
@@ -29,11 +39,11 @@ internal class Client
     {
         while (!disconnected)
         {
-            await Task.Delay(4000); // 3 sec on client, 4 here.
+            await Task.Delay(1000);
 
-            missedHeartbeats++;
+            heartValue += 1;
 
-            if (missedHeartbeats < 5) continue;
+            if (heartValue < Variables.heartbeatTimeout) continue;
 
             Disconnect(DisconnectCode.HeartbeatTimeout);
         }
@@ -41,14 +51,13 @@ internal class Client
 
     public async Task Send(byte[] data)
     {
-        EncrpytionHelper.Encrypt(data);
-
         await stream.WriteAsync(data);
     }
 
     public void Disconnect(DisconnectCode code)
     {
         if (disconnected) return;
+        room?.Disconnect(this);
 
         client.Close();
         client.Dispose();

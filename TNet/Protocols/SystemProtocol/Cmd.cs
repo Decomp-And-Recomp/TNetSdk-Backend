@@ -1,4 +1,4 @@
-﻿namespace TNet.Protocols.Common;
+﻿namespace TNet.Protocols.SystemProtocol;
 
 internal enum Cmd : ushort
 {

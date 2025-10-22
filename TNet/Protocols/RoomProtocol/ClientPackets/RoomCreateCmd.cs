@@ -1,6 +1,6 @@
 ﻿using TNet.Protocols.Objects;
 
-namespace TNet.Protocols.Room.Client;
+namespace TNet.Protocols.RoomProtocol.ClientPackets;
 
 internal class RoomCreateCmd : IClientPacket
 {

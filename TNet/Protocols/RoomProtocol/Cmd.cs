@@ -1,4 +1,4 @@
-﻿namespace TNet.Protocols.Room;
+﻿namespace TNet.Protocols.RoomProtocol;
 
 internal enum Cmd : ushort
 {

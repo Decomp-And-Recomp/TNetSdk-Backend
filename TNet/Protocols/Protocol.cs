@@ -2,6 +2,6 @@
 
 internal enum Protocol
 {
-    Common = 1,
+    System = 1,
     Room = 2
 }

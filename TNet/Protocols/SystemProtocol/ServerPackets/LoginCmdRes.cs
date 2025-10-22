@@ -1,4 +1,4 @@
-﻿namespace TNet.Protocols.Common.Server;
+﻿namespace TNet.Protocols.SystemProtocol.ServerPackets;
 
 internal class LoginCmdRes : IServerPacket
 {

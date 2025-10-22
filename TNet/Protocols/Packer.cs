@@ -1,5 +1,7 @@
 ﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using TNet.Binary;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using TNet.Helpers;
 
 namespace TNet.Protocols;
 
@@ -7,10 +9,10 @@ internal class Packer : BufferWriter
 {
     const int minCompressSize = 256;
 
-    public byte[] MakePacket(Common.Cmd cmd)
+    public byte[] MakePacket(SystemProtocol.Cmd cmd)
         => MakePacket(1, (ushort)cmd);
 
-    public byte[] MakePacket(Room.Cmd cmd)
+    public byte[] MakePacket(RoomProtocol.Cmd cmd)
         => MakePacket(2, (ushort)cmd);
 
     public byte[] MakePacket(ushort protocol, ushort cmd)
@@ -39,8 +41,9 @@ internal class Packer : BufferWriter
         w.PushUInt16(compressType);
         w.PushByteArray(data);
 
-        Logger.Log($"New packet: {(Protocol)protocol}:{cmd}");
+        byte[] finalArray = w.ToByteArray();
+        EncrpytionHelper.Encrypt(finalArray);
 
-        return w.ToByteArray();
+        return finalArray;
     }
 }

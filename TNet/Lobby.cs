@@ -13,16 +13,15 @@ internal static class Lobby
     public const int headerSize = 10;
 
     static TcpListener listener = null!;
-    public static readonly BlowFish blowFish = new("ExampleKey");
-    public static Version version;
+    public static BlowFish? blowFish;
 
     public static ConcurrentDictionary<ushort, Client> clients = [];
     public static ConcurrentDictionary<ushort, Room> rooms = [];
 
     static readonly ProtocolHandler[] handlers = {
         new DummyProtocolHandler(),
-        new Protocols.Common.CommonProtocolHandler(),
-        new Protocols.Room.RoomProtocolHandler()
+        new Protocols.SystemProtocol.SystemProtocolHandler(),
+        new Protocols.RoomProtocol.RoomProtocolHandler()
     };
 
     public static async Task Run(int port)
@@ -48,6 +47,13 @@ internal static class Lobby
     {
         Client client = new(tcpClient);
 
+        while (true)
+        {
+            client.id = RandomHelper.GetClientId();
+
+            if (clients.TryAdd(client.id, client)) break;
+        }
+
         Logger.Info($"New client connected.");
 
         byte[] buffer = new byte[maxPacketLength];
@@ -59,7 +65,16 @@ internal static class Lobby
 
         while (true)
         {
-            read = await client.stream.ReadAsync(buffer);
+            try
+            {
+                read = await client.stream.ReadAsync(buffer);
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception(ex);
+                client.Disconnect(DisconnectCode.ReadException);
+                return;
+            }
 
             if (read == 0)
             {
@@ -103,7 +118,9 @@ internal static class Lobby
                 }
                 catch (Exception ex)
                 {
+                    client.Disconnect(DisconnectCode.PacketException);
                     Logger.Exception(ex);
+                    return;
                 }
             }
         }
@@ -119,11 +136,7 @@ internal static class Lobby
         UnPacker unPacker = new();
         unPacker.SetData(data);
 
-        if (!unPacker.Initialize())
-        {
-            Logger.Error("Cannot initialize unPacker.");
-            return;
-        }
+        if (!unPacker.Initialize()) throw new Exception("Cannot initialize unPacker.");
 
         handlers[(int)unPacker.protocol].Handle(client, unPacker);
     }

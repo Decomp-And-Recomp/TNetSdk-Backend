@@ -2,11 +2,11 @@
 
 internal class RandomHelper
 {
-    static Random random = new();
+    static readonly Random random = new();
 
     public static ushort GetRoomId()
     {
-        return (ushort)random.Next(ushort.MinValue, ushort.MaxValue);
+        return (ushort)random.Next(Variables.minRoomValue, Variables.maxRoomValue);
     }
 
     public static ushort GetClientId()
