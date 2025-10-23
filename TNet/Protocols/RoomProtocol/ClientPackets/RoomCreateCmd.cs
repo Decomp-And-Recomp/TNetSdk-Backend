@@ -27,6 +27,8 @@ internal class RoomCreateCmd : IClientPacket
         roomType = (RoomType)rType;
         switchMasterType = (RoomSwitchMasterType)sType;
 
+        if (!unPacker.PopString(ref param)) return false;
+
         return true;
     }
 }

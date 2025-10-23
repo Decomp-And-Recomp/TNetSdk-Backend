@@ -13,7 +13,7 @@ internal class RoomInfo
     public bool hasPassword;
     public string roomName = string.Empty;
     public string creatorName = string.Empty;
-    public string comment = string.Empty;
+    public string param = string.Empty;
 
     public void FromRoom(Room room)
     {
@@ -26,7 +26,7 @@ internal class RoomInfo
         hasPassword = !string.IsNullOrEmpty(room.password);
         roomName = room.name;
         creatorName = room.owner.nickname;
-        comment = room.comment;
+        param = room.param;
     }
 
     public void ToWriter(BufferWriter w)
@@ -39,8 +39,8 @@ internal class RoomInfo
         w.PushUInt16(started ? (ushort)1 : (ushort)0);
         w.PushUInt16(hasPassword ? (ushort)1 : (ushort)0);
 
-        w.PushString(roomName, 16);
         w.PushString(creatorName, 16);
-        w.PushString(comment, 64);
+        w.PushString(roomName, 16);
+        w.PushString(param, 64);
     }
 }

@@ -13,7 +13,6 @@ internal static class Lobby
     public const int headerSize = 10;
 
     static TcpListener listener = null!;
-    public static BlowFish? blowFish;
 
     public static ConcurrentDictionary<ushort, Client> clients = [];
     public static ConcurrentDictionary<ushort, Room> rooms = [];

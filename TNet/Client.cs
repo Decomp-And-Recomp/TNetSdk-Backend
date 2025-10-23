@@ -20,6 +20,7 @@ internal class Client
     public string nickname = string.Empty;
 
     public Room? room;
+    public bool isRoomOwner => room?.owner == this;
 
     public float heartValue;
 

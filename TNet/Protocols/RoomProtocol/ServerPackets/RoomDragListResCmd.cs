@@ -17,6 +17,7 @@ internal class RoomDragListResCmd : IServerPacket
         p.PushUInt16(page);
         p.PushUInt16(pageSum);
         p.PushUInt16((ushort)listType);
+        p.PushUInt16((ushort)rooms.Count());
 
         RoomInfo info = new();
         foreach (var v in rooms)

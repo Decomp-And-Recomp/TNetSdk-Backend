@@ -48,6 +48,9 @@ internal class RoomProtocolHandler : ProtocolHandler
             case Cmd.DragList:
                 OnDragList(client, unPacker);
                 return;
+            case Cmd.Destroy:
+                OnDestroy(client, unPacker);
+                return;
             default:
                 throw new Exception($"Cannot handle Room cmd '{(Cmd)unPacker.cmd}'");
         }
@@ -237,8 +240,23 @@ internal class RoomProtocolHandler : ProtocolHandler
         {
             page = cmd.page,
             pageSum = cmd.pageSplit,
+            listType = cmd.listType,
             rooms = rooms
         };
+
+        _ = client.Send(res.Pack());
+    }
+
+    static void OnDestroy(Client client, UnPacker unPacker)
+    {
+        if (client.room == null) return;
+
+        RoomDestroyResCmd res = new()
+        {
+            success = client.isRoomOwner
+        };
+
+        if (res.success) client.room.Close();
 
         _ = client.Send(res.Pack());
     }

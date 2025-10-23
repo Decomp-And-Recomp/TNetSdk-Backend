@@ -73,7 +73,7 @@ internal class BufferWriter
         byte[] bytes = Encoding.ASCII.GetBytes(str);
         byte[] post = new byte[padding];
 
-        Array.Copy(bytes, post, bytes.Length > 16 ? 16 : bytes.Length);
+        Array.Copy(bytes, post, bytes.Length > padding ? padding : bytes.Length);
 
         if (nullByteAtEnd) post[padding - 1] = 0;
 

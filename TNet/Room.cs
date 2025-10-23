@@ -17,7 +17,7 @@ internal class Room
 
     public string name { get; private set; } = string.Empty;
     public string password { get; private set; } = string.Empty;
-    public string comment { get; private set; } = string.Empty;
+    public string param { get; private set; } = string.Empty;
     public ushort maxClients { get; private set; }
     public ushort groupId { get; private set; }
 
@@ -32,7 +32,7 @@ internal class Room
             name = cmd.roomName,
             password = cmd.password,
             maxClients = cmd.maxClients,
-            comment = cmd.param,
+            param = cmd.param,
             groupId = cmd.groupId,
             owner = client,
             switchMasterType = cmd.switchMasterType
@@ -293,7 +293,7 @@ internal class Room
         {
             if (switchMasterType == RoomSwitchMasterType.None || clients.Count < 1)
             {
-                // close
+                Close();
                 return;
             }
 
@@ -304,5 +304,15 @@ internal class Room
 
             SendToAll(notifyChange.Pack());
         }
+    }
+
+    public void Close()
+    {
+        RoomDestroyNotifyCmd notify = new();
+
+        SendToAll(notify.Pack());
+
+        if (!Lobby.rooms.TryRemove(id, out var removed)) Logger.Error($"Unable to remove room '{id}' from dictionary.");
+        else if (removed != this) Logger.Error($"When trying to remove room '{id}', some other room got removed.");
     }
 }
