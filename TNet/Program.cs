@@ -54,7 +54,7 @@ for (int i = 0; i < args.Length; i++)
             break;
         case "-heartTime":
             text = args[i + 1];
-            if (float.TryParse(text, System.Globalization.NumberStyles.Any, null, out result2)) Variables.heartbeatTimeout = result2;
+            if (float.TryParse(text, System.Globalization.CultureInfo.InvariantCulture, out result2)) Variables.heartbeatTimeout = result2;
             else Logger.Error($"'{text}' is not a valid value for '-heartTime', the valid value must be a float (ex: '1.5').");
             break;
     }
