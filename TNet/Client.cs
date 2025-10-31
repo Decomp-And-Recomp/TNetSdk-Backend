@@ -59,6 +59,9 @@ internal class Client
         client.Close();
         client.Dispose();
 
+        if (!Lobby.clients.TryRemove(id, out var removed)) Logger.Error($"Unable to remove client'{id}' from dictionary.");
+        else if (removed != this) Logger.Error($"When trying to client room '{id}', some other client got removed.");
+
         disconnected = true;
 
         Logger.Info($"Client '{id}' disconnected, reason: '{code}'");
