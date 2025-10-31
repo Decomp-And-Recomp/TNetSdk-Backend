@@ -29,7 +29,7 @@ internal class SystemProtocolHandler : ProtocolHandler
 
         HeartbeatCmdRes response = new()
         {
-            m_server_time = (long)(DateTime.UtcNow - client.connectTime).TotalMilliseconds
+            m_server_time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         };
 
         client.heartValue = 0;

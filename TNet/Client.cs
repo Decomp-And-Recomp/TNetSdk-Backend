@@ -9,8 +9,6 @@ internal class Client
     public readonly TcpClient client;
     public readonly NetworkStream stream;
 
-    public readonly DateTime connectTime;
-
     public bool disconnected { get; private set; }
 
     public bool loggedIn;
@@ -30,8 +28,6 @@ internal class Client
     {
         this.client = client;
         stream = client.GetStream();
-
-        connectTime = DateTime.UtcNow;
 
         _ = HeartbeatLoop();
     }
