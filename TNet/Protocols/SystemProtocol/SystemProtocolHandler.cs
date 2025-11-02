@@ -64,12 +64,12 @@ internal class SystemProtocolHandler : ProtocolHandler
                 break;
             }
 
-            Logger.Info($"Client '{client.id}' idenefied as '{client.nickname}'.");
-
             client.loggedIn = true;
             client.nickname = cmd.nickname;
             response.userId = client.id;
             response.nickname = cmd.nickname;
+
+            Logger.Info($"Client '{client.id}' idenefied as '{client.nickname}'.");
         }
 
         _ = client.Send(response.Pack());
