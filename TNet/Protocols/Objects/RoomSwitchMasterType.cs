@@ -1,6 +1,6 @@
 ﻿namespace TNet.Protocols.Objects;
 
-public enum RoomSwitchMasterType : ushort
+internal enum RoomSwitchMasterType : ushort
 {
     None = 0,
     Auto = 1

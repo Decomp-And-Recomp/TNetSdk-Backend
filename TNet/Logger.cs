@@ -12,11 +12,36 @@ public enum LogLevel
 
 public static class Logger
 {
-    static readonly object logLock = new();
+    private static readonly SemaphoreSlim LogLock = new(1, 1);
 
     public static void Log(LogLevel level, object? message)
     {
-        lock (logLock)
+        _ = LogInner(level, message);
+    }
+
+    public static void Log(object message)
+        => Log(LogLevel.Log, message);
+
+    public static void Info(object message)
+        => Log(LogLevel.Info, message);
+
+    public static void Warning(object message)
+        => Log(LogLevel.Warning, message);
+
+    public static void Error(object message)
+        => Log(LogLevel.Error, message);
+
+    public static void Exception(Exception exception)
+        => Log(LogLevel.Exception, $"Message: {exception.Message}\nStack Trace: {exception.StackTrace}");
+
+    public static void Exception(Exception exception, object additional)
+        => Log(LogLevel.Exception, $"Message: {exception.Message}\nStack Trace: {exception.StackTrace}\nAdditional:{additional}");
+
+    private static async Task LogInner(LogLevel level, object? message)
+    {
+        await LogLock.WaitAsync();
+
+        try
         {
             switch (level)
             {
@@ -57,20 +82,11 @@ public static class Logger
 
             Console.WriteLine(message!.ToString());
         }
+        catch
+        {
+
+        }
+
+        LogLock.Release();
     }
-
-    public static void Log(object? message)
-        => Log(LogLevel.Log, message);
-
-    public static void Info(object? message)
-        => Log(LogLevel.Info, message);
-
-    public static void Warning(object? message)
-        => Log(LogLevel.Warning, message);
-
-    public static void Error(object? message)
-        => Log(LogLevel.Error, message);
-
-    public static void Exception(Exception exception)
-        => Log(LogLevel.Exception, $"Message: {exception.Message}\nStack Trace: {exception.StackTrace}");
 }

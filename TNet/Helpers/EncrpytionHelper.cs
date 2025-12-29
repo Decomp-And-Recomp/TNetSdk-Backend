@@ -4,27 +4,27 @@ namespace TNet.Helpers;
 
 internal static class EncrpytionHelper
 {
-    static BlowFish? blowFish;
+    private static BlowFish? BlowFish;
 
     public static void Initialize()
     {
-        if (string.IsNullOrWhiteSpace(Variables.encryptionKey)) Logger.Warning("Not using any encryption, key is not set.");
+        if (string.IsNullOrWhiteSpace(Variables.EncryptionKey)) Logger.Warning("Not using any encryption, key is not set.");
         else
         {
             Logger.Info("Initializing encryption..");
-            blowFish = new(Variables.encryptionKey);
+            BlowFish = new(Variables.EncryptionKey);
         }
     }
 
     public static void Decrypt(List<byte> data)
     {
-        if (blowFish == null) return;
+        if (BlowFish == null) return;
 
         uint num = (uint)((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
         uint num2 = (uint)((data[4] << 24) | (data[5] << 16) | (data[6] << 8) | data[7]);
         ulong num3 = num;
         num3 = (num3 << 32) + num2;
-        blowFish.Decrypt(ref num3);
+        BlowFish.Decrypt(ref num3);
         num = (uint)(num3 >> 32);
         num2 = (uint)num3;
         data[0] = (byte)(((num & 0xFF000000u) >> 24) & 0xFFu);
@@ -39,13 +39,13 @@ internal static class EncrpytionHelper
 
     public static void Encrypt(byte[] data)
     {
-        if (blowFish == null) return;
+        if (BlowFish == null) return;
 
         uint num = (uint)((data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]);
         uint num2 = (uint)((data[4] << 24) | (data[5] << 16) | (data[6] << 8) | data[7]);
         ulong num3 = num;
         num3 = (num3 << 32) + num2;
-        blowFish.Encrypt(ref num3);
+        BlowFish.Encrypt(ref num3);
         num = (uint)(num3 >> 32);
         num2 = (uint)num3;
         data[0] = (byte)(((num & 0xFF000000u) >> 24) & 0xFFu);

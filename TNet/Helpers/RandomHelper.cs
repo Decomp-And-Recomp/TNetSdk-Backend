@@ -2,15 +2,15 @@
 
 internal class RandomHelper
 {
-    static readonly Random random = new();
+    private static readonly Random Random = new();
 
     public static ushort GetRoomId()
     {
-        return (ushort)random.Next(Variables.minRoomValue, Variables.maxRoomValue);
+        return (ushort)Random.Next(Variables.MinRoomValue, Variables.MaxRoomValue);
     }
 
     public static ushort GetClientId()
     {
-        return (ushort)random.Next(ushort.MinValue, ushort.MaxValue);
+        return (ushort)Random.Next(ushort.MinValue, ushort.MaxValue);
     }
 }

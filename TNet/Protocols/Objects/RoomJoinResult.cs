@@ -1,6 +1,6 @@
 ﻿namespace TNet.Protocols.Objects;
 
-public enum RoomJoinResult : ushort
+internal enum RoomJoinResult : ushort
 {
     Ok = 0,
     Full = 1,

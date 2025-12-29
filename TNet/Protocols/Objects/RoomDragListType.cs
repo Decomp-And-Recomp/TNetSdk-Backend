@@ -1,6 +1,6 @@
 ﻿namespace TNet.Protocols.Objects;
 
-public enum RoomDragListType : ushort
+internal enum RoomDragListType : ushort
 {
     All = 0,
     NotFull = 1,

@@ -78,7 +78,7 @@ internal class RoomProtocolHandler : ProtocolHandler
         response.roomId = room.id;
         _ = client.Send(response.Pack());
 
-        if (Variables.version != Version.Gen1) return;
+        if (Variables.Version != Version.Gen1) return;
 
         RoomJoinResCmd joinResponse = new()
         {
@@ -98,7 +98,7 @@ internal class RoomProtocolHandler : ProtocolHandler
 
         if (!cmd.Parse(unPacker)) throw new Exception("Unable to parse 'RoomJoinCmd'.");
 
-        if (!Lobby.rooms.TryGetValue(cmd.id, out var room))
+        if (!Lobby.Rooms.TryGetValue(cmd.id, out var room))
         {
             RoomJoinResCmd result = new()
             {
@@ -212,20 +212,20 @@ internal class RoomProtocolHandler : ProtocolHandler
 
         var rooms = cmd.listType switch
         {
-            RoomDragListType.All => Lobby.rooms
+            RoomDragListType.All => Lobby.Rooms
             .OrderBy(kv => kv.Key)
             .Skip((cmd.page - 1) * cmd.pageSplit)
             .Take(cmd.pageSplit)
             .Select(kv => kv.Value),
 
-            RoomDragListType.NotFull => Lobby.rooms
+            RoomDragListType.NotFull => Lobby.Rooms
             .Where(kv => kv.Value.GetOnline() < kv.Value.maxClients)
             .OrderBy(kv => kv.Key)
             .Skip((cmd.page - 1) * cmd.pageSplit)
             .Take(cmd.pageSplit)
             .Select(kv => kv.Value),
 
-            RoomDragListType.NotFullNotStarted => Lobby.rooms
+            RoomDragListType.NotFullNotStarted => Lobby.Rooms
             .Where(kv => !kv.Value.started)
             .Where(kv => kv.Value.GetOnline() < kv.Value.maxClients)
             .OrderBy(kv => kv.Key)

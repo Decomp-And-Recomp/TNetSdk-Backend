@@ -9,25 +9,25 @@ namespace TNet;
 
 internal static class Lobby
 {
-    public const int maxPacketLength = 4098;
-    public const int headerSize = 10;
+    public const int MaxPacketLength = 4098;
+    public const int HeaderSize = 10;
 
-    static TcpListener listener = null!;
+    private static TcpListener Listener = null!;
 
-    public static ConcurrentDictionary<ushort, Client> clients = [];
-    public static ConcurrentDictionary<ushort, Room> rooms = [];
+    public static ConcurrentDictionary<ushort, Client> Clients = [];
+    public static ConcurrentDictionary<ushort, Room> Rooms = [];
 
-    static readonly ProtocolHandler[] handlers = {
+    private static readonly ProtocolHandler[] Handlers = [
         new DummyProtocolHandler(),
         new Protocols.SystemProtocol.SystemProtocolHandler(),
         new Protocols.RoomProtocol.RoomProtocolHandler()
-    };
+    ];
 
     public static async Task Run(int port)
     {
-        listener = new(IPAddress.Any, port);
+        Listener = new(IPAddress.Any, port);
 
-        listener.Start();
+        Listener.Start();
 
         Logger.Info($"Server now running on port '{port}'");
 
@@ -38,7 +38,7 @@ internal static class Lobby
     {
         while (true)
         {
-            _ = HandleClient(await listener.AcceptTcpClientAsync());
+            _ = HandleClient(await Listener.AcceptTcpClientAsync());
         }
     }
 
@@ -50,12 +50,12 @@ internal static class Lobby
         {
             client.id = RandomHelper.GetClientId();
 
-            if (clients.TryAdd(client.id, client)) break;
+            if (Clients.TryAdd(client.id, client)) break;
         }
 
         Logger.Info($"New client connected.");
 
-        byte[] buffer = new byte[maxPacketLength];
+        byte[] buffer = new byte[MaxPacketLength];
         List<byte> received = [];
 
         int read;
@@ -83,7 +83,7 @@ internal static class Lobby
 
             received.AddRange(buffer.Take(read));
 
-            while (received.Count > headerSize)
+            while (received.Count > HeaderSize)
             {
                 if (lengthCalculated)
                 {
@@ -95,7 +95,7 @@ internal static class Lobby
 
                     length = GetLength(received);
 
-                    if (length < headerSize || length > maxPacketLength)
+                    if (length < HeaderSize || length > MaxPacketLength)
                     {
                         Logger.Error($"Length received: {length}");
                         client.Disconnect(DisconnectCode.DataOutOfBounds);
@@ -137,6 +137,6 @@ internal static class Lobby
 
         if (!unPacker.Initialize()) throw new Exception("Cannot initialize unPacker.");
 
-        handlers[(int)unPacker.protocol].Handle(client, unPacker);
+        Handlers[(int)unPacker.protocol].Handle(client, unPacker);
     }
 }

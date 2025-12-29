@@ -5,16 +5,16 @@ namespace TNet.Protocols;
 
 internal class UnPacker : BufferReader
 {
-    ushort _length;
+    private ushort _length;
     public ushort length => _length;
 
-    ushort _version;
+    private ushort _version;
     public ushort version => _version;
 
-    Protocol _protocol;
+    private Protocol _protocol;
     public Protocol protocol => _protocol;
 
-    ushort _cmd;
+    private ushort _cmd;
     public ushort cmd => _cmd;
 
     public bool Initialize()

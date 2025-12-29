@@ -45,7 +45,7 @@ internal class SystemProtocolHandler : ProtocolHandler
 
         LoginCmdRes response = new();
 
-        if (Lobby.clients.Count >= Variables.maxClients)
+        if (Lobby.Clients.Count >= Variables.MaxClients)
         {
             response.result = LoginCmdRes.Result.Error_Password; // there isnt anything else i can use
         }
@@ -57,9 +57,9 @@ internal class SystemProtocolHandler : ProtocolHandler
             {
                 id = RandomHelper.GetClientId();
 
-                if (Lobby.clients.ContainsKey(id)) continue;
+                if (Lobby.Clients.ContainsKey(id)) continue;
 
-                if (!Lobby.clients.TryAdd(id, client)) continue;
+                if (!Lobby.Clients.TryAdd(id, client)) continue;
 
                 break;
             }

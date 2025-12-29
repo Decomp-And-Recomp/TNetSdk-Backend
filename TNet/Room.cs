@@ -25,7 +25,7 @@ internal class Room
 
     public static Room? TryCreate(RoomCreateCmd cmd, Client client)
     {
-        if (Lobby.rooms.Count >= Variables.maxRooms) return null;
+        if (Lobby.Rooms.Count >= Variables.MaxRooms) return null;
 
         Room result = new()
         {
@@ -44,11 +44,11 @@ internal class Room
         {
             id = RandomHelper.GetRoomId();
 
-            if (Lobby.rooms.ContainsKey(id)) continue;
+            if (Lobby.Rooms.ContainsKey(id)) continue;
 
             result.id = id;
 
-            if (!Lobby.rooms.TryAdd(id, result)) continue;
+            if (!Lobby.Rooms.TryAdd(id, result)) continue;
 
             break;
         }
@@ -143,14 +143,12 @@ internal class Room
         if (started)
         {
             Logger.Error("Cannot start already started room.");
-            // disconnect
             return;
         }
 
         if (startedBy != owner)
         {
             Logger.Error("Only owners can start the room.");
-            // disconnect
             return;
         }
 
@@ -282,8 +280,10 @@ internal class Room
             return;
         }
 
-        RoomLeaveNotifyCmd notifyLeave = new();
-        notifyLeave.userId = client.id;
+        RoomLeaveNotifyCmd notifyLeave = new()
+        {
+            userId = client.id
+        };
 
         SendToAll(notifyLeave.Pack());
         clients.Remove(client);
@@ -299,8 +299,10 @@ internal class Room
 
             owner = clients[0];
 
-            RoomCreaterChangeNotifyCmd notifyChange = new();
-            notifyChange.userId = owner.id;
+            RoomCreaterChangeNotifyCmd notifyChange = new()
+            {
+                userId = owner.id
+            };
 
             SendToAll(notifyChange.Pack());
         }
@@ -312,7 +314,7 @@ internal class Room
 
         SendToAll(notify.Pack());
 
-        if (!Lobby.rooms.TryRemove(id, out var removed)) Logger.Error($"Unable to remove room '{id}' from dictionary.");
+        if (!Lobby.Rooms.TryRemove(id, out var removed)) Logger.Error($"Unable to remove room '{id}' from dictionary.");
         else if (removed != this) Logger.Error($"When trying to remove room '{id}', some other room got removed.");
     }
 }

@@ -2,14 +2,14 @@
 
 internal class Variables
 {
-    public static ushort maxRooms = 250;
-    public static ushort maxClients = 500;
+    public static ushort MaxRooms = 250;
+    public static ushort MaxClients = 500;
 
-    public static ushort minRoomValue = 1000;
-    public static ushort maxRoomValue = 9999;
+    public static ushort MinRoomValue = 1000;
+    public static ushort MaxRoomValue = 9999;
 
-    public static float heartbeatTimeout = 10;
+    public static float HeartbeatTimeout = 10;
 
-    public static string encryptionKey = string.Empty;
-    public static Version version = Version.Gen1;
+    public static string EncryptionKey = string.Empty;
+    public static Version Version = Version.Gen1;
 }
