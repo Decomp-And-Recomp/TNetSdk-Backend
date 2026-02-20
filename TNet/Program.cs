@@ -42,8 +42,8 @@ bool TryGetInt(string entry, out int arg)
 
 if (TryGetInt("-gen", out var gen))
 {
-    if (Math.Clamp(gen, 0, 3) == gen) Variables.Version = (TNet.Version)gen;
-    else Logger.Error($"'{gen}' is not a valid value for '-gen', the bounds are from 0 to 2.");
+    if (Math.Clamp(gen, 1, 3) == gen) Variables.Version = (TNet.Version)gen+1;
+    else Logger.Error($"'{gen}' is not a valid value for '-gen', the bounds are from 1 to 3.");
 }
 
 if (TryGetArg("-key", out var key)) Variables.EncryptionKey = key;
