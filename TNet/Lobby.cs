@@ -44,6 +44,12 @@ internal static class Lobby
 
     static async Task HandleClient(TcpClient tcpClient)
     {
+        if (Clients.Count >= Variables.MaxClients)
+        {
+            tcpClient.Close();
+            return;
+        }
+
         Client client = new(tcpClient);
 
         while (true)

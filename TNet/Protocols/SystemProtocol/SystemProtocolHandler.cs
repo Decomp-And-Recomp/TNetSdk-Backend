@@ -45,32 +45,25 @@ internal class SystemProtocolHandler : ProtocolHandler
 
         LoginCmdRes response = new();
 
-        if (Lobby.Clients.Count >= Variables.MaxClients)
+        ushort id;
+
+        while (true)
         {
-            response.result = LoginCmdRes.Result.Error_Password; // there isnt anything else i can use
+            id = RandomHelper.GetClientId();
+
+            if (Lobby.Clients.ContainsKey(id)) continue;
+
+            if (!Lobby.Clients.TryAdd(id, client)) continue;
+
+            break;
         }
-        else
-        {
-            ushort id;
 
-            while (true)
-            {
-                id = RandomHelper.GetClientId();
+        client.loggedIn = true;
+        client.nickname = cmd.nickname;
+        response.userId = client.id;
+        response.nickname = cmd.nickname;
 
-                if (Lobby.Clients.ContainsKey(id)) continue;
-
-                if (!Lobby.Clients.TryAdd(id, client)) continue;
-
-                break;
-            }
-
-            client.loggedIn = true;
-            client.nickname = cmd.nickname;
-            response.userId = client.id;
-            response.nickname = cmd.nickname;
-
-            Logger.Info($"Client '{client.id}' idenefied as '{client.nickname}'.");
-        }
+        Logger.Info($"Client '{client.id}' idenefied as '{client.nickname}'.");
 
         _ = client.Send(response.Pack());
 
